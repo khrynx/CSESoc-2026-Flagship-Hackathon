@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
+type HelloResponse = {
+  message: string
+}
+
 function App() {
   const [message, setMessage] = useState('Connecting to backend...')
 
   useEffect(() => {
     fetch('/api/hello')
       .then((response) => response.json())
-      .then((data) => setMessage(data.message))
+      .then((data: HelloResponse) => setMessage(data.message))
       .catch(() => setMessage('Could not reach the backend. Is the server running?'))
   }, [])
 
@@ -19,4 +23,5 @@ function App() {
     </main>
   )
 }
+
 export default App
