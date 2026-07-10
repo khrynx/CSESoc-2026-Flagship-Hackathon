@@ -1,25 +1,273 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './App.css'
 
-type HelloResponse = {
-  message: string
+type GroupBuy = {
+  id: number
+  title: string
+  item: string
+  totalQty: string
+  shareQty: string
+  split: string
+  price: string
+  savings: string
+  participants: number
+  remaining: string
+  pickup: string
+  closes: string
+  impact: string
+  accent: string
+  position: {
+    lat: number
+    lng: number
+  }
 }
 
+const groupBuys: GroupBuy[] = [
+  {
+    id: 1,
+    title: 'Rice share',
+    item: '5kg rice bag',
+    totalQty: '5kg total',
+    shareQty: '1kg share',
+    split: '3kg + 1kg + 1kg',
+    price: '$12 bulk',
+    savings: '$4 each',
+    participants: 6,
+    remaining: '2kg left',
+    pickup: 'Northside Community Hall',
+    closes: '6:30 PM',
+    impact: '2 fewer deliveries',
+    accent: '#14b8a6',
+    position: { lat: -33.8688, lng: 151.2093 },
+  },
+  {
+    id: 2,
+    title: 'Pasta round-up',
+    item: '3kg pasta box',
+    totalQty: '3kg total',
+    shareQty: '750g share',
+    split: '1.5kg + 750g + 750g',
+    price: '$8 bulk',
+    savings: '$3 each',
+    participants: 4,
+    remaining: '1.5kg left',
+    pickup: 'Elm Street Cafe',
+    closes: '8:00 PM',
+    impact: '1.2kg packaging avoided',
+    accent: '#3b82f6',
+    position: { lat: -33.873, lng: 151.223 },
+  },
+  {
+    id: 3,
+    title: 'Soap Hi lol',
+    item: '4L dish soap',
+    totalQty: '4L total',
+    shareQty: '1L share',
+    split: '2L + 1L + 1L',
+    price: '$11 bulk',
+    savings: '$4 each',
+    participants: 8,
+    remaining: '1L left',
+    pickup: 'River Park Gate',
+    closes: '7:15 PM',
+    impact: '3 shared households',
+    accent: '#f59e0b',
+    position: { lat: -33.88, lng: 151.2 },
+  },
+]
+
 function App() {
-  const [message, setMessage] = useState('Connecting to backend...')
+  const [selectedId, setSelectedId] = useState(1)
+  const [mapReady, setMapReady] = useState(false)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+  const mapInstanceRef = useRef<maplibregl.Map | null>(null)
+  const markersRef = useRef<maplibregl.Marker[]>([])
+
+  const selectedBuy = useMemo(
+    () => groupBuys.find((item) => item.id === selectedId) ?? groupBuys[0],
+    [selectedId],
+  )
 
   useEffect(() => {
-    fetch('/api/hello')
-      .then((response) => response.json())
-      .then((data: HelloResponse) => setMessage(data.message))
-      .catch(() => setMessage('Could not reach the backend. Is the server running?'))
+    if (!navigator.geolocation) {
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude })
+      },
+      () => undefined,
+    )
   }, [])
 
+  useEffect(() => {
+    if (!mapContainerRef.current) {
+      return
+    }
+
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        center: userLocation ? [userLocation.lng, userLocation.lat] : [groupBuys[0].position.lng, groupBuys[0].position.lat],
+        zoom: userLocation ? 13 : 12,
+        attributionControl: false,
+      })
+
+      mapInstanceRef.current.addControl(new maplibregl.NavigationControl(), 'top-right')
+      mapInstanceRef.current.addControl(
+        new maplibregl.AttributionControl({ compact: true }),
+        'bottom-right',
+      )
+
+      mapInstanceRef.current.on('load', () => {
+        requestAnimationFrame(() => mapInstanceRef.current?.resize())
+        setMapReady(true)
+      })
+    }
+
+    const map = mapInstanceRef.current
+
+    markersRef.current.forEach((marker) => marker.remove())
+    markersRef.current = groupBuys.map((buy) => {
+      const marker = new maplibregl.Marker({ color: buy.accent })
+        .setLngLat([buy.position.lng, buy.position.lat])
+        .setPopup(
+          new maplibregl.Popup({ offset: 20 }).setHTML(`<strong>${buy.title}</strong><br />${buy.item}`),
+        )
+        .addTo(map)
+
+      marker.getElement().addEventListener('click', () => setSelectedId(buy.id))
+      return marker
+    })
+  }, [userLocation])
+
+  useEffect(() => {
+    if (!mapInstanceRef.current) {
+      return
+    }
+
+    mapInstanceRef.current.flyTo({
+      center: [selectedBuy.position.lng, selectedBuy.position.lat],
+      zoom: 13,
+      essential: true,
+    })
+
+    markersRef.current.forEach((marker, index) => {
+      const buy = groupBuys[index]
+      const element = marker.getElement()
+      element.style.width = buy.id === selectedBuy.id ? '18px' : '14px'
+      element.style.height = buy.id === selectedBuy.id ? '18px' : '14px'
+      element.style.border = buy.id === selectedBuy.id ? '3px solid #10213a' : '2px solid white'
+      element.style.transform = 'translate(-50%, -50%)'
+    })
+  }, [selectedBuy])
+
   return (
-    <main className="app">
-      <h1>CSESoc 2026 Flagship Hackathon</h1>
-      <p>the goatest hackathon project eva</p>
-      <p className="api-message">{message}</p>
+    <main className="app-shell">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">Local community bulk-buying</p>
+          <h1>Neighbourly</h1>
+        </div>
+        <button type="button" className="ghost-btn">
+          Create group buy
+        </button>
+      </header>
+
+      <section className="hero-card">
+        <div>
+          <h2>One bulk item, shared across neighbours.</h2>
+          <p>
+            Buy a big pack once and split it fairly. A 5kg bag of rice can become 3kg for one home, 1kg for another, and 1kg for a third.
+          </p>
+        </div>
+        <div className="hero-stats">
+          <div>
+            <strong>+$320</strong>
+            <span>saved this week</span>
+          </div>
+          <div>
+            <strong>14</strong>
+            <span>active orders</span>
+          </div>
+          <div>
+            <strong>6.4kg</strong>
+            <span>packaging avoided</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="dashboard">
+        <div className="map-card">
+          <div className="map-header">
+            <div>
+              <p className="eyebrow">Live around you</p>
+              <h3>Nearby shared buys</h3>
+            </div>
+            <span className="pill">Updated 2 min ago</span>
+          </div>
+
+          <div className="map-surface">
+            <div ref={mapContainerRef} className="map-canvas" />
+            {!mapReady ? <div className="map-loading">Loading map…</div> : null}
+          </div>
+        </div>
+
+        <aside className="detail-card">
+          <div className="detail-top">
+            <p className="eyebrow">Selected order</p>
+            <h3>{selectedBuy.title}</h3>
+            <p>{selectedBuy.item}</p>
+          </div>
+
+          <div className="detail-grid">
+            <div>
+              <span>Shared total</span>
+              <strong>{selectedBuy.totalQty}</strong>
+            </div>
+            <div>
+              <span>Your share</span>
+              <strong>{selectedBuy.shareQty}</strong>
+            </div>
+            <div>
+              <span>Bulk price</span>
+              <strong>{selectedBuy.price}</strong>
+            </div>
+            <div>
+              <span>Savings</span>
+              <strong>{selectedBuy.savings}</strong>
+            </div>
+          </div>
+
+          <ul className="detail-list">
+            <li>
+              <span>Suggested split</span>
+              <strong>{selectedBuy.split}</strong>
+            </li>
+            <li>
+              <span>Pickup</span>
+              <strong>{selectedBuy.pickup}</strong>
+            </li>
+            <li>
+              <span>Closes</span>
+              <strong>{selectedBuy.closes}</strong>
+            </li>
+            <li>
+              <span>Impact</span>
+              <strong>{selectedBuy.impact}</strong>
+            </li>
+          </ul>
+
+          <button type="button" className="primary-btn">
+            Join with {selectedBuy.shareQty}
+          </button>
+        </aside>
+      </section>
     </main>
   )
 }
