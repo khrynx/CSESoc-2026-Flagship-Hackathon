@@ -81,7 +81,6 @@ const groupBuys: GroupBuy[] = [
 ]
 
 function App() {
-  const [selectedId, setSelectedId] = useState(1)
   const [mapReady, setMapReady] = useState(false)
   const [mapError, setMapError] = useState(false)
   const [mapRetryCount, setMapRetryCount] = useState(0)
@@ -103,6 +102,9 @@ function App() {
     hostquantity: '',
   })
   const [poolMessage, setPoolMessage] = useState('')
+  const [joinQuantity, setJoinQuantity] = useState(1)
+  const [selectedLocation, setSelectedLocation] = useState<{ lng: number; lat: number } | null>(null)
+  const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
   const [pools, setPools] = useState<Array<{
     id: string
     itemName: string
@@ -121,9 +123,9 @@ function App() {
   const selectedLocationMarkerRef = useRef<maplibregl.Marker | null>(null)
   const hasAutoRetriedRef = useRef(false)
 
-  const selectedBuy = useMemo(
-    () => groupBuys.find((item) => item.id === selectedId) ?? groupBuys[0],
-    [selectedId],
+  const selectedPool = useMemo(
+    () => pools.find((pool) => pool.id === selectedPoolId) ?? null,
+    [pools, selectedPoolId],
   )
 
   useEffect(() => {
@@ -243,6 +245,8 @@ function App() {
 
       map.on('click', (event) => {
         const { lng, lat } = event.lngLat
+        setSelectedLocation({ lng, lat })
+        setSelectedPoolId(null)
         setPoolForm((current) => ({
           ...current,
           longitude: lng.toFixed(6),
@@ -286,7 +290,11 @@ function App() {
         )
         .addTo(map)
 
-      marker.getElement().addEventListener('click', () => setSelectedId(Number(pool.id)))
+      marker.getElement().addEventListener('click', (event) => {
+        event.stopPropagation()
+        setSelectedPoolId(pool.id)
+        setSelectedLocation(null)
+      })
       return marker
     })
   }, [mapReady, pools])
@@ -295,8 +303,6 @@ function App() {
     if (!mapInstanceRef.current) {
       return
     }
-
-    const selectedPool = pools.find((pool) => Number(pool.id) === selectedId)
 
     if (selectedPool) {
       mapInstanceRef.current.flyTo({
@@ -309,12 +315,13 @@ function App() {
     markersRef.current.forEach((marker, index) => {
       const pool = pools[index]
       const element = marker.getElement()
-      element.style.width = pool && Number(pool.id) === selectedId ? '18px' : '14px'
-      element.style.height = pool && Number(pool.id) === selectedId ? '18px' : '14px'
-      element.style.border = pool && Number(pool.id) === selectedId ? '3px solid #10213a' : '2px solid white'
+      const isSelected = Boolean(pool && pool.id === selectedPoolId)
+      element.style.width = isSelected ? '18px' : '14px'
+      element.style.height = isSelected ? '18px' : '14px'
+      element.style.border = isSelected ? '3px solid #10213a' : '2px solid white'
       element.style.transform = 'translate(-50%, -50%)'
     })
-  }, [selectedId, pools])
+  }, [pools, selectedPool, selectedPoolId])
 
   const parseApiResponse = async (response: Response) => {
     const text = await response.text()
@@ -401,7 +408,7 @@ function App() {
       const response = await fetch(`/api/pools/${poolId}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUser?.userId, quantity: 1 }),
+        body: JSON.stringify({ userId: currentUser?.userId, quantity: joinQuantity }),
       })
 
       const data = await parseApiResponse(response)
@@ -565,191 +572,137 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div>
-          <p className="eyebrow">Local community bulk-buying</p>
-          <h1>Neighbourly</h1>
+        <div className="brand-row">
+          <div className="brand-badge">N</div>
+          <span className="brand-name">Neighbourly</span>
         </div>
+        <p className="topbar-hint">Click the map to create a pool | Click a marker to join one</p>
         <div className="topbar-actions">
+          {currentUser && <span className="pill">Hi, {currentUser.username}</span>}
           <button type="button" className="ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
             Log out
-          </button>
-          <button type="button" className="ghost-btn" onClick={() => setPoolMessage('') }>
-            Create group buy
           </button>
         </div>
       </header>
 
-      <section className="hero-card">
-        <div>
-          <h2>One bulk item, shared across neighbours.</h2>
-          <p>
-            Buy a big pack once and split it fairly. A 5kg bag of rice can become 3kg for one home, 1kg for another, and 1kg for a third.
-          </p>
-        </div>
-        <div className="hero-stats">
-          <div>
-            <strong>+$320</strong>
-            <span>saved this week</span>
+      <div className="map-fullscreen">
+        <div ref={mapContainerRef} className="map-canvas" />
+        {!mapReady && <div className="map-loading">Loading map…</div>}
+        {mapError && (
+          <div className="map-error">
+            Map failed to load.{' '}
+            <button type="button" onClick={() => retryMap('manual')}>Retry</button>
           </div>
-          <div>
-            <strong>14</strong>
-            <span>active orders</span>
-          </div>
-          <div>
-            <strong>6.4kg</strong>
-            <span>packaging avoided</span>
-          </div>
-        </div>
-      </section>
+        )}
+        <button type="button" className="map-reload-btn" title="Reload map" onClick={() => retryMap('manual')}>
+          ↺
+        </button>
 
-      <section className="dashboard">
-        <div className="map-card">
-          <div className="map-header">
-            <div>
-              <p className="eyebrow">Create a shared buy</p>
-              <h3>Start a new pool</h3>
-            </div>
-          </div>
-
-          <form className="auth-form" onSubmit={handlePoolSubmit}>
-            <label className="input-group">
-              <span>Item name</span>
-              <input name="itemName" value={poolForm.itemName} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Description</span>
-              <textarea name="desc" value={poolForm.desc} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Price</span>
-              <input name="price" type="number" value={poolForm.price} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Quantity goal</span>
-              <input name="quantityGoal" type="number" value={poolForm.quantityGoal} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Deadline</span>
-              <input name="deadline" type="datetime-local" value={poolForm.deadline} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Longitude</span>
-              <input name="longitude" type="number" value={poolForm.longitude} onChange={handlePoolFormChange} />
-            </label>
-            <label className="input-group">
-              <span>Latitude</span>
-              <input name="latitude" type="number" value={poolForm.latitude} onChange={handlePoolFormChange} />
-            </label>
-            <p className="auth-link">Click the map to choose the pickup location.</p>
-            <label className="input-group">
-              <span>Your quantity</span>
-              <input name="hostquantity" type="number" value={poolForm.hostquantity} onChange={handlePoolFormChange} />
-            </label>
-            <button type="submit" className="primary-btn">Create pool</button>
-            {poolMessage ? <p className="form-message success">{poolMessage}</p> : null}
-          </form>
-        </div>
-
-        <div className="map-card">
-          <div className="map-header">
-            <div>
-              <p className="eyebrow">Join a shared buy</p>
-              <h3>Available pools</h3>
-            </div>
-          </div>
-
-          <div className="detail-list">
-            {pools.length === 0 ? (
-              <p className="auth-link">No pools yet. Create one to get started.</p>
-            ) : (
-              pools.map((pool) => (
-                <div key={pool.id} className="detail-list-item">
-                  <div>
-                    <strong>{pool.itemName}</strong>
-                    <p>{pool.desc}</p>
-                  </div>
-                  <button type="button" className="primary-btn" onClick={() => handleJoinPool(pool.id)}>
-                    Join
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="dashboard">
-        <div className="map-card">
-          <div className="map-header">
-            <div>
-              <p className="eyebrow">Live around you</p>
-              <h3>Nearby shared buys</h3>
-            </div>
-            <div className="map-actions">
-              <span className="pill">Updated 2 min ago</span>
-              <button type="button" className="ghost-btn" onClick={() => retryMap('manual')}>
-                Retry map
+        {/* Create pool popup – top left */}
+        {selectedLocation && (
+          <aside className="popup popup-create">
+            <div className="popup-header">
+              <h3>Create a pool</h3>
+              <button
+                type="button"
+                className="popup-close"
+                onClick={() => {
+                  setSelectedLocation(null)
+                  if (selectedLocationMarkerRef.current) {
+                    selectedLocationMarkerRef.current.remove()
+                    selectedLocationMarkerRef.current = null
+                  }
+                  setPoolMessage('')
+                }}
+              >
+                ✕
               </button>
             </div>
-          </div>
+            <form className="popup-form" onSubmit={handlePoolSubmit}>
+              <label className="input-group">
+                <span>Item name</span>
+                <input name="itemName" value={poolForm.itemName} onChange={handlePoolFormChange} required />
+              </label>
+              <label className="input-group">
+                <span>Description</span>
+                <textarea name="desc" value={poolForm.desc} onChange={handlePoolFormChange} />
+              </label>
+              <label className="input-group">
+                <span>Price ($)</span>
+                <input name="price" type="number" min="0" step="0.01" value={poolForm.price} onChange={handlePoolFormChange} required />
+              </label>
+              <label className="input-group">
+                <span>Quantity goal</span>
+                <input name="quantityGoal" type="number" min="1" value={poolForm.quantityGoal} onChange={handlePoolFormChange} required />
+              </label>
+              <label className="input-group">
+                <span>Your quantity</span>
+                <input name="hostquantity" type="number" min="1" value={poolForm.hostquantity} onChange={handlePoolFormChange} required />
+              </label>
+              <label className="input-group">
+                <span>Deadline</span>
+                <input name="deadline" type="datetime-local" value={poolForm.deadline} onChange={handlePoolFormChange} required />
+              </label>
+              <p className="location-hint">📍 {Number(poolForm.latitude).toFixed(4)}, {Number(poolForm.longitude).toFixed(4)}</p>
+              <button type="submit" className="primary-btn">Create pool</button>
+              {poolMessage && <p className="form-message success">{poolMessage}</p>}
+            </form>
+          </aside>
+        )}
 
-          <div className="map-surface">
-            <div ref={mapContainerRef} className="map-canvas" />
-            {!mapReady ? <div className="map-loading">Loading map…</div> : null}
-            {mapError ? <div className="map-loading">Map is taking longer than expected. You can still create a pool and the location picker will work.</div> : null}
-          </div>
-        </div>
-
-        <aside className="detail-card">
-          <div className="detail-top">
-            <p className="eyebrow">Selected order</p>
-            <h3>{selectedBuy.title}</h3>
-            <p>{selectedBuy.item}</p>
-          </div>
-
-          <div className="detail-grid">
-            <div>
-              <span>Shared total</span>
-              <strong>{selectedBuy.totalQty}</strong>
+        {/* View / Join pool popup – right */}
+        {selectedPool && (
+          <aside className="popup popup-detail">
+            <div className="popup-header">
+              <h3>{selectedPool.itemName}</h3>
+              <button
+                type="button"
+                className="popup-close"
+                onClick={() => { setSelectedPoolId(null); setPoolMessage('') }}
+              >
+                ✕
+              </button>
             </div>
-            <div>
-              <span>Your share</span>
-              <strong>{selectedBuy.shareQty}</strong>
+            <div className="popup-body">
+              <p className="pool-desc">{selectedPool.desc}</p>
+              <div className="detail-grid">
+                <div><span>Price</span><strong>${selectedPool.price}</strong></div>
+                <div><span>Goal</span><strong>{selectedPool.quantityGoal} units</strong></div>
+                <div><span>Claimed</span><strong>{selectedPool.currentTotal} units</strong></div>
+                <div><span>Remaining</span><strong>{selectedPool.quantityGoal - selectedPool.currentTotal} units</strong></div>
+              </div>
+              <p className="detail-deadline">Closes: {new Date(selectedPool.deadline).toLocaleString()}</p>
+              <div className="participants-section">
+                <p className="eyebrow">Participants ({selectedPool.participants.length})</p>
+                {selectedPool.participants.length === 0 ? (
+                  <p className="pool-desc">No participants yet. Be the first!</p>
+                ) : (
+                  <ul className="participants-list">
+                    {selectedPool.participants.map((p) => (
+                      <li key={p.userId}>{p.username} — {p.quantity} units</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="join-row">
+                <label className="input-group join-qty">
+                  <span>Qty</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={joinQuantity}
+                    onChange={(e) => setJoinQuantity(Math.max(1, Number(e.target.value)))}
+                  />
+                </label>
+                <button type="button" className="primary-btn" onClick={() => handleJoinPool(selectedPool.id)}>
+                  Join pool
+                </button>
+              </div>
+              {poolMessage && <p className="form-message success">{poolMessage}</p>}
             </div>
-            <div>
-              <span>Bulk price</span>
-              <strong>{selectedBuy.price}</strong>
-            </div>
-            <div>
-              <span>Savings</span>
-              <strong>{selectedBuy.savings}</strong>
-            </div>
-          </div>
-
-          <ul className="detail-list">
-            <li>
-              <span>Suggested split</span>
-              <strong>{selectedBuy.split}</strong>
-            </li>
-            <li>
-              <span>Pickup</span>
-              <strong>{selectedBuy.pickup}</strong>
-            </li>
-            <li>
-              <span>Closes</span>
-              <strong>{selectedBuy.closes}</strong>
-            </li>
-            <li>
-              <span>Impact</span>
-              <strong>{selectedBuy.impact}</strong>
-            </li>
-          </ul>
-
-          <button type="button" className="primary-btn">
-            Join with {selectedBuy.shareQty}
-          </button>
-        </aside>
-      </section>
+          </aside>
+        )}
+      </div>
     </main>
   )
 }
