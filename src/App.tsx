@@ -782,7 +782,7 @@ function App() {
           <select
             className="distance-select"
             value={distanceFilter}
-            onChange={(e) => { setDistanceFilter(e.target.value); setActiveSearchQuery(searchQuery) }}
+            onChange={(e) => setDistanceFilter(e.target.value)}
             disabled={!userLocation}
             title={userLocation ? 'Filter by distance from your location' : 'Allow location access to filter by distance'}
           >
