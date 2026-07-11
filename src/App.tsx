@@ -82,9 +82,11 @@ function App() {
   const [selectedId, setSelectedId] = useState(1)
   const [mapReady, setMapReady] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [view, setView] = useState<'app' | 'login'>('app')
+  const [view, setView] = useState<'app' | 'auth'>('auth')
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [loginData, setLoginData] = useState({ email: '', password: '' })
-  const [loginMessage, setLoginMessage] = useState('')
+  const [signupData, setSignupData] = useState({ username: '', email: '', password: '', phoneNumber: '' })
+  const [authMessage, setAuthMessage] = useState('')
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -175,18 +177,74 @@ function App() {
     setLoginData((current) => ({ ...current, [name]: value }))
   }
 
-  const handleLoginSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSignupChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setSignupData((current) => ({ ...current, [name]: value }))
+  }
+
+  const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (!loginData.email || !loginData.password) {
-      setLoginMessage('Please enter both your email and password.')
+      setAuthMessage('Please enter both your email and password.')
       return
     }
 
-    setLoginMessage(`Welcome back, ${loginData.email}!`)
+    try {
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: loginData.email,
+          password: loginData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to sign in right now.')
+      }
+
+      setAuthMessage(`Welcome back, ${data.user?.username || loginData.email}!`)
+      setView('app')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to sign in right now.'
+      setAuthMessage(message)
+    }
   }
 
-  if (view === 'login') {
+  const handleSignupSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!signupData.username || !signupData.email || !signupData.password || !signupData.phoneNumber) {
+      setAuthMessage('Please fill in every field to create an account.')
+      return
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signupData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to create account right now.')
+      }
+
+      setAuthMessage('Account created. You can sign in now.')
+      setLoginData({ email: signupData.email, password: '' })
+      setAuthMode('login')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to create account right now.'
+      setAuthMessage(message)
+    }
+  }
+
+  if (view === 'auth') {
     return (
       <main className="auth-page">
         <section className="auth-card">
@@ -199,30 +257,71 @@ function App() {
             <p>Log in to see local group buys, manage your shares, and keep your community updates close by.</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleLoginSubmit}>
-            <h2>Log in</h2>
-            <p className="auth-intro">Sign in to continue</p>
+          {authMode === 'login' ? (
+            <form className="auth-form" onSubmit={handleLoginSubmit}>
+              <h2>Log in</h2>
+              <p className="auth-intro">Sign in to continue</p>
 
-            <label className="input-group">
-              <span>Email address</span>
-              <input name="email" type="email" placeholder="you@example.com" value={loginData.email} onChange={handleLoginChange} />
-            </label>
+              <label className="input-group">
+                <span>Email address</span>
+                <input name="email" type="email" placeholder="you@example.com" value={loginData.email} onChange={handleLoginChange} />
+              </label>
 
-            <label className="input-group">
-              <span>Password</span>
-              <input name="password" type="password" placeholder="Enter your password" value={loginData.password} onChange={handleLoginChange} />
-            </label>
+              <label className="input-group">
+                <span>Password</span>
+                <input name="password" type="password" placeholder="Enter your password" value={loginData.password} onChange={handleLoginChange} />
+              </label>
 
-            <button type="submit" className="primary-btn">
-              Sign in
-            </button>
+              <button type="submit" className="primary-btn">
+                Sign in
+              </button>
 
-            {loginMessage ? <p className="form-message success">{loginMessage}</p> : null}
+              <button type="button" className="ghost-btn" onClick={() => setAuthMode('signup')}>
+                Create an account
+              </button>
 
-            <p className="auth-link">
-              Need an account? <a href="#" onClick={() => setView('app')}>Back to home</a>
-            </p>
-          </form>
+              {authMessage ? <p className="form-message success">{authMessage}</p> : null}
+
+              <p className="auth-link">
+                Demo login: <strong>demo@example.com</strong> / <strong>Password123!</strong>
+              </p>
+            </form>
+          ) : (
+            <form className="auth-form" onSubmit={handleSignupSubmit}>
+              <h2>Create account</h2>
+              <p className="auth-intro">Join Neighbourly to start sharing group buys.</p>
+
+              <label className="input-group">
+                <span>Full name</span>
+                <input name="username" placeholder="Alex Nguyen" value={signupData.username} onChange={handleSignupChange} />
+              </label>
+
+              <label className="input-group">
+                <span>Email address</span>
+                <input name="email" type="email" placeholder="you@example.com" value={signupData.email} onChange={handleSignupChange} />
+              </label>
+
+              <label className="input-group">
+                <span>Password</span>
+                <input name="password" type="password" placeholder="Choose a password" value={signupData.password} onChange={handleSignupChange} />
+              </label>
+
+              <label className="input-group">
+                <span>Phone number</span>
+                <input name="phoneNumber" placeholder="0400000000" value={signupData.phoneNumber} onChange={handleSignupChange} />
+              </label>
+
+              <button type="submit" className="primary-btn">
+                Sign up
+              </button>
+
+              <button type="button" className="ghost-btn" onClick={() => setAuthMode('login')}>
+                Back to sign in
+              </button>
+
+              {authMessage ? <p className="form-message success">{authMessage}</p> : null}
+            </form>
+          )}
         </section>
       </main>
     )
@@ -236,8 +335,8 @@ function App() {
           <h1>Neighbourly</h1>
         </div>
         <div className="topbar-actions">
-          <button type="button" className="ghost-btn" onClick={() => setView('login')}>
-            Log in
+          <button type="button" className="ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
+            Log out
           </button>
           <button type="button" className="ghost-btn">
             Create group buy

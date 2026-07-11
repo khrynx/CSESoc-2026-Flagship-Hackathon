@@ -1,7 +1,7 @@
 import { getData, generateUserId, type Pool } from './dataStore.js';
 import bcrypt from 'bcrypt';
 
-export function regsiterUser(username:string, email:string, password:string, phoneNumber:string) {
+export function registerUser(username:string, email:string, password:string, phoneNumber:string) {
     const data = getData();
     
     // Email validation
@@ -30,6 +30,8 @@ export function regsiterUser(username:string, email:string, password:string, pho
         pools
     });
 }
+
+export const regsiterUser = registerUser;
 
 export function loginUser(email:string, inputPassword:string) {
     const data = getData();
