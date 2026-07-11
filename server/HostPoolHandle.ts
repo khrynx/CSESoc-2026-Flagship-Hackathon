@@ -11,6 +11,21 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
     if (hostquantity > quantityGoal) {
         throw new Error('Host quantity cannot exceed the total quantity goal');
     }
+
+    if (!(deadline instanceof Date) || Number.isNaN(deadline.getTime())) {
+        throw new Error('Deadline must be a valid date and time');
+    }
+
+    const now = new Date();
+    const maxDeadline = new Date(now.getTime() + 50 * 24 * 60 * 60 * 1000);
+    if (deadline <= now) {
+        throw new Error('Deadline must be in the future');
+    }
+
+    if (deadline > maxDeadline) {
+        throw new Error('Deadline must be within 50 days from now');
+    }
+
     // default, CHANGE LATER
 
     const newPool = {

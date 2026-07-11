@@ -60,6 +60,26 @@
             }
           ],
           "category": "Snacks"
+        },
+        {
+          "id": "6891apj6j",
+          "itemName": "josh pradhan",
+          "desc": "the goat",
+          "price": 999,
+          "quantityGoal": 888,
+          "currentTotal": 0,
+          "deadline": "2026-07-31T02:01:00.000Z",
+          "longitude": 151.207487,
+          "latitude": -33.883797,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            }
+          ],
+          "category": "Clothing"
         }
       ],
       "participatingPools": [],
@@ -124,6 +144,26 @@
         }
       ],
       "category": "Snacks"
+    },
+    {
+      "id": "6891apj6j",
+      "itemName": "josh pradhan",
+      "desc": "the goat",
+      "price": 999,
+      "quantityGoal": 888,
+      "currentTotal": 0,
+      "deadline": "2026-07-31T02:01:00.000Z",
+      "longitude": 151.207487,
+      "latitude": -33.883797,
+      "participants": [
+        {
+          "userId": "dez7v6c44",
+          "username": "Kevin Li",
+          "quantity": 1,
+          "phoneNumber": "1"
+        }
+      ],
+      "category": "Clothing"
     }
   ],
   "sessions": [
@@ -137,6 +177,14 @@
     },
     {
       "sessionId": "if3r95qej",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "1bz1rlb8a",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "ntmo8woro",
       "userId": "dez7v6c44"
     }
   ]
