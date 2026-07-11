@@ -10,6 +10,7 @@ export interface Participant {
 }
 
 export interface Pool {
+    id: string;
     itemName: string;
     desc: string;
     price: number;
