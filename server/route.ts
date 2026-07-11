@@ -144,9 +144,21 @@ router.get('/users/:userId/pools', (req, res) => {
 
 router.get('/search', (req, res) => {
   try {
-    const { q, distance, lng, lat } = req.query
+    const { q, distance, lng, lat, categories } = req.query
 
     let results = searchPools(String(q ?? ''))
+
+    if (categories !== undefined) {
+      const selectedCategories = String(categories)
+        .split(',')
+        .map((category) => category.trim())
+        .filter(Boolean)
+
+      if (selectedCategories.length > 0) {
+        const categorySet = new Set(selectedCategories)
+        results = results.filter((pool) => categorySet.has(String(pool.category ?? '')))
+      }
+    }
 
     if (distance !== undefined && lng !== undefined && lat !== undefined) {
       const maxDist = Number(distance)

@@ -29,6 +29,7 @@ type Pool = {
   hostUserId?: string
   itemName: string
   desc: string
+  category?: string
   price: number
   quantityGoal: number
   currentTotal: number
@@ -142,6 +143,7 @@ function App() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [homeSearchQuery, setHomeSearchQuery] = useState('')
   const [homeDistanceFilter, setHomeDistanceFilter] = useState('')
+  const [homeCategoryFilters, setHomeCategoryFilters] = useState<string[]>([])
   const [homeSearchResults, setHomeSearchResults] = useState<Pool[]>([])
   const [showHomeDropdown, setShowHomeDropdown] = useState(false)
   const [displayedPools, setDisplayedPools] = useState<Pool[]>([])
@@ -159,6 +161,13 @@ function App() {
     [pools, selectedPoolId],
   )
 
+  const myParticipantPools = useMemo(() => {
+    if (!currentUser?.userId) {
+      return []
+    }
+    return pools.filter((pool) => pool.participants.some((participant) => participant.userId === currentUser.userId))
+  }, [currentUser?.userId, pools])
+
   const getPoolMarkerColor = (pool: Pool): string => {
     const fullness = Math.max(0, Math.min(1, pool.currentTotal / pool.quantityGoal))
     const hue = 120 - fullness * 120
@@ -171,6 +180,14 @@ function App() {
     }
     const hostId = pool.hostUserId ?? pool.participants[0]?.userId
     return hostId === currentUser.userId
+  }
+
+  const toggleHomeCategoryFilter = (category: string) => {
+    setHomeCategoryFilters((current) =>
+      current.includes(category)
+        ? current.filter((value) => value !== category)
+        : [...current, category],
+    )
   }
 
   useEffect(() => {
@@ -426,7 +443,7 @@ function App() {
   }, [activeSearchQuery, distanceFilter, pools, userLocation])
 
   useEffect(() => {
-    if (!homeSearchQuery.trim() && !homeDistanceFilter) {
+    if (!homeSearchQuery.trim() && !homeDistanceFilter && homeCategoryFilters.length === 0) {
       setHomeSearchResults([])
       setShowHomeDropdown(false)
       return
@@ -435,6 +452,9 @@ function App() {
       try {
         const params = new URLSearchParams()
         if (homeSearchQuery.trim()) params.set('q', homeSearchQuery)
+        if (homeCategoryFilters.length > 0) {
+          params.set('categories', homeCategoryFilters.join(','))
+        }
         if (homeDistanceFilter && userLocation) {
           params.set('distance', (Number(homeDistanceFilter) / 111).toFixed(6))
           params.set('lng', String(userLocation.lng))
@@ -451,7 +471,7 @@ function App() {
       }
     }
     run()
-  }, [homeSearchQuery, homeDistanceFilter, userLocation])
+  }, [homeSearchQuery, homeDistanceFilter, homeCategoryFilters, userLocation])
 
   useEffect(() => {
     const map = mapInstanceRef.current
@@ -773,6 +793,7 @@ function App() {
           <h1 className="home-title">Find a group buy<br />near you.</h1>
           <p className="home-subtitle">Split bulk purchases with neighbours. Save money, cut waste.</p>
 
+          <div className="home-content-row">
           <div className="home-search-wrapper" onClick={(e) => e.stopPropagation()}>
             <form
               className="home-search-form"
@@ -813,6 +834,22 @@ function App() {
               </button>
             </form>
 
+            <div className="home-category-row">
+              {poolCategories.map((category) => {
+                const isActive = homeCategoryFilters.includes(category)
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    className={`home-category-chip${isActive ? ' active' : ''}`}
+                    onClick={() => toggleHomeCategoryFilter(category)}
+                  >
+                    {category}
+                  </button>
+                )
+              })}
+            </div>
+
             {showHomeDropdown && homeSearchResults.length > 0 && (
               <ul className="home-dropdown">
                 {homeSearchResults.map((pool) => (
@@ -828,18 +865,54 @@ function App() {
                   >
                     <strong>{pool.itemName}</strong>
                     <span>{pool.desc}</span>
+                    {pool.category ? <span>{pool.category}</span> : null}
                     <span className="dropdown-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
                   </li>
                 ))}
               </ul>
             )}
 
-            {(homeSearchQuery || homeDistanceFilter) && !showHomeDropdown && homeSearchResults.length === 0 && (
+            {(homeSearchQuery || homeDistanceFilter || homeCategoryFilters.length > 0) && !showHomeDropdown && homeSearchResults.length === 0 && (
               <div className="home-no-results">No pools found
                 {homeSearchQuery ? ` for “${homeSearchQuery}”` : ''}
                 {homeDistanceFilter ? ` within ${homeDistanceFilter} km` : ''}
+                {homeCategoryFilters.length > 0 ? ` in ${homeCategoryFilters.join(', ')}` : ''}
               </div>
             )}
+          </div>
+
+          <aside className="home-my-pools" onClick={(e) => e.stopPropagation()}>
+            <div className="home-my-pools-header">
+              <h3>Your pools</h3>
+              <span>{myParticipantPools.length}</span>
+            </div>
+            {myParticipantPools.length === 0 ? (
+              <p className="home-my-pools-empty">You have not joined any pools yet.</p>
+            ) : (
+              <ul className="home-my-pools-list">
+                {myParticipantPools.map((pool) => {
+                  const hostedByMe = isHostedByCurrentUser(pool)
+                  return (
+                    <li
+                      key={pool.id}
+                      className={`home-my-pool-item${hostedByMe ? ' hosted' : ''}`}
+                      onClick={() => {
+                        setSelectedPoolId(pool.id)
+                        setView('app')
+                      }}
+                    >
+                      <div className="home-my-pool-top">
+                        <strong>{pool.itemName}</strong>
+                        {hostedByMe ? <span className="home-my-pool-badge">Hosting</span> : <span className="home-my-pool-badge muted">Joined</span>}
+                      </div>
+                      <span>{pool.category ?? 'Uncategorized'}</span>
+                      <span className="dropdown-meta">{pool.quantityGoal - pool.currentTotal} remaining</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </aside>
           </div>
         </div>
       </main>
