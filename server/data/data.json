@@ -8,7 +8,34 @@
       "phoneNumber": "0400000000",
       "pools": [],
       "hostingPools": [],
-      "participatingPools": [],
+      "participatingPools": [
+        {
+          "id": "7f0ucerfm",
+          "itemName": "Ethan Hendra",
+          "desc": "hes dumb",
+          "price": 69,
+          "quantityGoal": 999,
+          "currentTotal": 1,
+          "deadline": "2026-07-31T11:52:00.000Z",
+          "longitude": 151.207309,
+          "latitude": -33.87428,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            },
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 1,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Snacks"
+        }
+      ],
       "hostReviews": [],
       "participantReviews": []
     },
@@ -106,7 +133,7 @@
       "desc": "hes dumb",
       "price": 69,
       "quantityGoal": 999,
-      "currentTotal": 0,
+      "currentTotal": 1,
       "deadline": "2026-07-31T11:52:00.000Z",
       "longitude": 151.207309,
       "latitude": -33.87428,
@@ -116,6 +143,12 @@
           "username": "Kevin Li",
           "quantity": 1,
           "phoneNumber": "1"
+        },
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 1,
+          "phoneNumber": "0400000000"
         }
       ],
       "category": "Snacks"
@@ -165,6 +198,14 @@
     {
       "sessionId": "roxzibkmv",
       "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "2gn5kogju",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "hpe8eprjk",
+      "userId": "e2k9vn1m8"
     }
   ]
 }

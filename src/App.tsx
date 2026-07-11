@@ -164,6 +164,8 @@ function App() {
     return `hsl(${hue}, 85%, 45%)`
   }
 
+  const isHostedByCurrentUser = (pool: Pool): boolean => Boolean(currentUser?.userId && pool.participants[0]?.userId === currentUser.userId)
+
   useEffect(() => {
     if (!navigator.geolocation) {
       return
@@ -391,6 +393,10 @@ function App() {
         .setLngLat([pool.longitude, pool.latitude])
         .addTo(map)
 
+      if (isHostedByCurrentUser(pool)) {
+        marker.getElement().classList.add('pool-marker-hosted')
+      }
+
       marker.getElement().addEventListener('click', (event) => {
         event.stopPropagation()
         setSelectedPoolId(pool.id)
@@ -398,7 +404,7 @@ function App() {
       })
       return marker
     })
-  }, [mapReady, displayedPools])
+  }, [currentUser?.userId, mapReady, displayedPools])
 
   useEffect(() => {
     if (!mapInstanceRef.current || !mapReady) {
