@@ -384,9 +384,6 @@ function App() {
     markersRef.current = displayedPools.map((pool) => {
       const marker = new maplibregl.Marker({ color: '#14b8a6' })
         .setLngLat([pool.longitude, pool.latitude])
-        .setPopup(
-          new maplibregl.Popup({ offset: 20 }).setHTML(`<strong>${pool.itemName}</strong><br />${pool.desc}`),
-        )
         .addTo(map)
 
       marker.getElement().addEventListener('click', (event) => {
