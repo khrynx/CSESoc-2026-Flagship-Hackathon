@@ -295,6 +295,14 @@ function App() {
     return pool.participants.some((participant) => participant.userId === currentUser.userId)
   }
 
+  const hasValidCoordinates = (pool: Pool): boolean =>
+    Number.isFinite(pool.longitude) &&
+    Number.isFinite(pool.latitude) &&
+    pool.longitude >= -180 &&
+    pool.longitude <= 180 &&
+    pool.latitude >= -90 &&
+    pool.latitude <= 90
+
   const hasHomeAdvancedFilters = Boolean(
     homeAdvancedFilters.category ||
       homeAdvancedFilters.price ||
@@ -710,7 +718,7 @@ function App() {
     }
 
     markersRef.current.forEach((marker) => marker.remove())
-    markersRef.current = displayedPools.map((pool) => {
+    markersRef.current = displayedPools.filter(hasValidCoordinates).map((pool) => {
       const marker = new maplibregl.Marker({ color: getPoolMarkerColor(pool) })
         .setLngLat([pool.longitude, pool.latitude])
         .addTo(map)
@@ -733,7 +741,7 @@ function App() {
       return
     }
 
-    if (selectedPool) {
+    if (selectedPool && hasValidCoordinates(selectedPool)) {
       mapInstanceRef.current.flyTo({
         center: [selectedPool.longitude, selectedPool.latitude],
         zoom: 13,
@@ -1457,6 +1465,7 @@ function App() {
           <div className="brand-row home-brand">
             <div className="brand-badge">N</div>
             <span className="brand-name">Neighbourly</span>
+            {currentUser ? <span className="home-brand-user">@{currentUser.username}</span> : null}
           </div>
           <div className="home-topbar-actions">
             {currentUser ? (
