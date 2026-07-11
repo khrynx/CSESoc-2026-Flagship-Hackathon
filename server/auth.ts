@@ -25,18 +25,16 @@ export function registerUser(username:string, email:string, password:string, pho
     const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password before storing
 
     const userId = generateUserId();
-    const emptyPool: Pool[] = [];
-    const emptyReviews: Review[] = [];
     const user: User = {
         userId,
         username,
         email: email.toLowerCase(),
         password: hashedPassword,
         phoneNumber,
-        participatingPools: emptyPool,
-        hostingPools: emptyPool,
-        hostReviews: emptyReviews,
-        participantReviews: emptyReviews,
+        participatingPools: [],
+        hostingPools: [],
+        hostReviews: [],
+        participantReviews: [],
         averageHostRating: 0,
         averageParticipantRating: 0,
         requests: []

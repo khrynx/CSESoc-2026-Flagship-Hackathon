@@ -14,6 +14,7 @@ export interface Participant {
 
 export interface Pool {
     id: string;
+    hostUserId: string;
     itemName: string;
     desc: string;
     price: number;
@@ -129,6 +130,7 @@ function normalizeData(rawData: Partial<Data> | null | undefined): Data {
         globalPools: Array.isArray(parsed.globalPools)
             ? parsed.globalPools.map((pool) => ({
                 ...pool,
+                hostUserId: (pool as Partial<Pool>).hostUserId ?? pool.participants?.[0]?.userId ?? '',
                 deadline: pool.deadline ? new Date(pool.deadline as string | Date) : new Date(),
             }))
             : [],

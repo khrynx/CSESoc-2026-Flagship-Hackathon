@@ -26,6 +26,7 @@ type GroupBuy = {
 
 type Pool = {
   id: string
+  hostUserId?: string
   itemName: string
   desc: string
   price: number
@@ -164,7 +165,13 @@ function App() {
     return `hsl(${hue}, 85%, 45%)`
   }
 
-  const isHostedByCurrentUser = (pool: Pool): boolean => Boolean(currentUser?.userId && pool.participants[0]?.userId === currentUser.userId)
+  const isHostedByCurrentUser = (pool: Pool): boolean => {
+    if (!currentUser?.userId) {
+      return false
+    }
+    const hostId = pool.hostUserId ?? pool.participants[0]?.userId
+    return hostId === currentUser.userId
+  }
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -193,21 +200,86 @@ function App() {
   }, [view])
 
   useEffect(() => {
-    const loadPools = async () => {
-      try {
-        const response = await fetch('/api/pools')
-        const data = await parseApiResponse(response)
+    let cancelled = false
 
-        if (response.ok) {
-          setPools(data.pools ?? [])
+    const refreshPools = async () => {
+      try {
+        const poolsResponse = await fetch('/api/pools')
+        const poolsData = await parseApiResponse(poolsResponse)
+        if (!poolsResponse.ok) {
+          return
+        }
+
+        const latestPools = poolsData.pools ?? []
+        if (cancelled) {
+          return
+        }
+
+        setPools(latestPools)
+
+        if (!activeSearchQuery && !distanceFilter) {
+          setDisplayedPools(latestPools)
+        }
+
+        if (!homeSearchQuery.trim() && !homeDistanceFilter) {
+          setHomeSearchResults([])
+          return
+        }
+
+        const searchParams = new URLSearchParams()
+        if (homeSearchQuery.trim()) searchParams.set('q', homeSearchQuery)
+        if (homeDistanceFilter && userLocation) {
+          searchParams.set('distance', (Number(homeDistanceFilter) / 111).toFixed(6))
+          searchParams.set('lng', String(userLocation.lng))
+          searchParams.set('lat', String(userLocation.lat))
+        }
+
+        const homeResponse = await fetch(`/api/search?${searchParams}`)
+        const homeData = await parseApiResponse(homeResponse)
+
+        if (!cancelled && homeResponse.ok) {
+          setHomeSearchResults(homeData.pools ?? [])
         }
       } catch {
-        setPools([])
+        if (!cancelled) {
+          setPools([])
+        }
+      }
+
+      if (!activeSearchQuery && !distanceFilter) {
+        return
+      }
+
+      try {
+        const params = new URLSearchParams()
+        if (activeSearchQuery) params.set('q', activeSearchQuery)
+        if (distanceFilter && userLocation) {
+          params.set('distance', (Number(distanceFilter) / 111).toFixed(6))
+          params.set('lng', String(userLocation.lng))
+          params.set('lat', String(userLocation.lat))
+        }
+
+        const response = await fetch(`/api/search?${params}`)
+        const data = await parseApiResponse(response)
+
+        if (!cancelled && response.ok) {
+          setDisplayedPools(data.pools ?? [])
+        }
+      } catch {
+        if (!cancelled) {
+          setDisplayedPools([])
+        }
       }
     }
 
-    loadPools()
-  }, [])
+    refreshPools()
+    const pollId = window.setInterval(refreshPools, 1000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(pollId)
+    }
+  }, [activeSearchQuery, distanceFilter, homeSearchQuery, homeDistanceFilter, userLocation])
 
   const retryMap = (source: 'manual' | 'auto' = 'manual') => {
     if (source === 'auto' && hasAutoRetriedRef.current) {

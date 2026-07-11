@@ -30,6 +30,7 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
 
     const newPool = {
         id: generatePoolId(),
+        hostUserId: userId,
         itemName,
         desc,
         price,

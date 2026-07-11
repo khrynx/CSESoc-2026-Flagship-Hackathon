@@ -7,7 +7,28 @@
       "password": "$2b$10$5Jq7rw8hQeuYKIAdWXpJzuJuWH0foHvS0gE7Fw7O54OcP7EBlhuhm",
       "phoneNumber": "0400000000",
       "pools": [],
-      "hostingPools": [],
+      "hostingPools": [
+        {
+          "id": "dzo3tz7cc",
+          "itemName": "josh pradhan",
+          "desc": "contact him",
+          "price": 99,
+          "quantityGoal": 99,
+          "currentTotal": 1,
+          "deadline": "2026-07-31T02:00:00.000Z",
+          "longitude": 151.203463,
+          "latitude": -33.894594,
+          "participants": [
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 1,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Clothing"
+        }
+      ],
       "participatingPools": [
         {
           "id": "7f0ucerfm",
@@ -34,6 +55,33 @@
             }
           ],
           "category": "Snacks"
+        },
+        {
+          "id": "jlcnq6wx4",
+          "hostUserId": "dez7v6c44",
+          "itemName": "allen",
+          "desc": "shoe",
+          "price": 9,
+          "quantityGoal": 99,
+          "currentTotal": 2,
+          "deadline": "2026-07-31T02:00:00.000Z",
+          "longitude": 151.213986,
+          "latitude": -33.89695,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            },
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 1,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Beverages"
         }
       ],
       "hostReviews": [],
@@ -107,6 +155,33 @@
             }
           ],
           "category": "Clothing"
+        },
+        {
+          "id": "jlcnq6wx4",
+          "hostUserId": "dez7v6c44",
+          "itemName": "allen",
+          "desc": "shoe",
+          "price": 9,
+          "quantityGoal": 99,
+          "currentTotal": 2,
+          "deadline": "2026-07-31T02:00:00.000Z",
+          "longitude": 151.213986,
+          "latitude": -33.89695,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            },
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 1,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Beverages"
         }
       ],
       "participatingPools": [],
@@ -151,7 +226,8 @@
           "phoneNumber": "0400000000"
         }
       ],
-      "category": "Snacks"
+      "category": "Snacks",
+      "hostUserId": "dez7v6c44"
     },
     {
       "id": "6891apj6j",
@@ -171,7 +247,56 @@
           "phoneNumber": "1"
         }
       ],
-      "category": "Clothing"
+      "category": "Clothing",
+      "hostUserId": "dez7v6c44"
+    },
+    {
+      "id": "dzo3tz7cc",
+      "itemName": "josh pradhan",
+      "desc": "contact him",
+      "price": 99,
+      "quantityGoal": 99,
+      "currentTotal": 1,
+      "deadline": "2026-07-31T02:00:00.000Z",
+      "longitude": 151.203463,
+      "latitude": -33.894594,
+      "participants": [
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 1,
+          "phoneNumber": "0400000000"
+        }
+      ],
+      "category": "Clothing",
+      "hostUserId": "e2k9vn1m8"
+    },
+    {
+      "id": "jlcnq6wx4",
+      "hostUserId": "dez7v6c44",
+      "itemName": "allen",
+      "desc": "shoe",
+      "price": 9,
+      "quantityGoal": 99,
+      "currentTotal": 2,
+      "deadline": "2026-07-31T02:00:00.000Z",
+      "longitude": 151.213986,
+      "latitude": -33.89695,
+      "participants": [
+        {
+          "userId": "dez7v6c44",
+          "username": "Kevin Li",
+          "quantity": 1,
+          "phoneNumber": "1"
+        },
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 1,
+          "phoneNumber": "0400000000"
+        }
+      ],
+      "category": "Beverages"
     }
   ],
   "sessions": [
@@ -206,6 +331,22 @@
     {
       "sessionId": "hpe8eprjk",
       "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "l7dw3l7cv",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "zznpfl7of",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "92mr9ciis",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "bubl3lmwm",
+      "userId": "dez7v6c44"
     }
   ]
 }
