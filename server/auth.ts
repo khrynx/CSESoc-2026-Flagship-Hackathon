@@ -1,4 +1,4 @@
-import { getData, generateUserId, persistData, type Pool, type User } from './dataStore.js';
+import { getData, generateUserId, persistData, Pool, User, Review } from './dataStore.js';
 import { createSession, getSession, removeSession } from './session.js';
 import bcrypt from 'bcrypt';
 
@@ -26,6 +26,7 @@ export function registerUser(username:string, email:string, password:string, pho
 
     const userId = generateUserId();
     const emptyPool: Pool[] = [];
+    const emptyReviews: Review[] = [];
     const user: User = {
         userId,
         username,
@@ -34,6 +35,8 @@ export function registerUser(username:string, email:string, password:string, pho
         phoneNumber,
         participatingPools: emptyPool,
         hostingPools: emptyPool,
+        hostReviews: emptyReviews,
+        participantReviews: emptyReviews
     };
 
     data.users.push(user);

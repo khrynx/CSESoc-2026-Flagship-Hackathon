@@ -35,6 +35,8 @@ export interface User {
     phoneNumber: string;
     hostingPools: Pool[];
     participatingPools: Pool[];
+    hostReviews: Review[];  // reviews received as a host
+    participantReviews: Review[]; // reviews received as a participant
 }
 
 export interface Data {
@@ -46,6 +48,15 @@ export interface Data {
 interface Session {
     sessionId: string;
     userId: string;
+}
+
+export interface Review {
+    isHost: boolean; // true if the reviewee is the host, false if the reviewee is a participant
+    reviewId: string;
+    reviewerId: string;
+    revieweeId: string; // the user being reviewed
+    rating: number; // 1-5
+    comment: string;
 }
 
 const __filename = fileURLToPath(import.meta.url);
