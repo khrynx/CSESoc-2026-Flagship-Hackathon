@@ -1,6 +1,6 @@
-import { getData, generatePoolId, persistData } from './dataStore.js'
+import { getData, generatePoolId, persistData, Categories, Category } from './dataStore.js'
 
-export function makePool(userId: string, itemName: string, desc: string, price: number, quantityGoal: number, deadline: Date, longitude: number, latitude: number, hostquantity: number) {
+export function makePool(userId: string, itemName: string, desc: string, price: number, quantityGoal: number, deadline: Date, longitude: number, latitude: number, hostquantity: number, category: Category) {
     const { users, globalPools } = getData();
     const user = users.find((u) => u.userId === userId);
 
@@ -11,6 +11,7 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
     if (hostquantity > quantityGoal) {
         throw new Error('Host quantity cannot exceed the total quantity goal');
     }
+    // default, CHANGE LATER
 
     const newPool = {
         id: generatePoolId(),
@@ -23,6 +24,7 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
         longitude,
         latitude,
         participants: [{ userId, username: user.username, quantity: hostquantity, phoneNumber: user.phoneNumber }],
+        category
     };
 
     globalPools.push(newPool);

@@ -70,7 +70,8 @@ export const Categories = ["Clothing",
                     "Pet Supplies",
                     "Health & Wellness",
                     "Baby & Kids",
-                    "School & Office Supplies"
+                    "School & Office Supplies",
+                    "Other"
                 ] as const;
 export type Category = typeof Categories[number];
 

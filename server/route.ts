@@ -27,6 +27,7 @@ router.post('/pools', (req, res) => {
       longitude,
       latitude,
       hostquantity,
+      category
     } = req.body ?? {}
 
     if (!userId || !itemName || !desc || !price || !quantityGoal || !deadline || longitude === undefined || latitude === undefined || hostquantity === undefined) {
@@ -44,6 +45,7 @@ router.post('/pools', (req, res) => {
       Number(longitude),
       Number(latitude),
       Number(hostquantity),
+      category
     )
 
     res.status(201).json({ pool })
