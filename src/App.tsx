@@ -273,7 +273,7 @@ function App() {
 
   useEffect(() => {
     const map = mapInstanceRef.current
-    if (!map) {
+    if (!map || !mapReady) {
       return
     }
 
@@ -289,7 +289,7 @@ function App() {
       marker.getElement().addEventListener('click', () => setSelectedId(Number(pool.id)))
       return marker
     })
-  }, [pools])
+  }, [mapReady, pools])
 
   useEffect(() => {
     if (!mapInstanceRef.current) {

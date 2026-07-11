@@ -1,6 +1,6 @@
-import { getData } from './dataStore.js'
+import { getData, persistData } from './dataStore.js'
 
-export function joinPool(userId: string, poolId: string, quantity: number) { 
+export function joinPool(userId: string, poolId: string, quantity: number) {
     const { users, globalPools } = getData();
     const pool = globalPools.find((p) => p.id === poolId);
     const user = users.find((u) => u.userId === userId);
@@ -22,8 +22,9 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
     }
 
     pool.currentTotal += quantity;
-    pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber }); 
-
+    pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
+    persistData();
+    return pool;
 }
 
 export function getHost(userId: string, poolId: string) {
@@ -98,6 +99,7 @@ export function leavePool(userId: string, poolId: string) {
         if (pool.participants[i].userId === userId) {
             pool.currentTotal -= pool.participants[i].quantity;
             pool.participants.splice(i, 1);
+            persistData();
             return;
         }
     }
