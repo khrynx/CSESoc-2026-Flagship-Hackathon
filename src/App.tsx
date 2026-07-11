@@ -399,7 +399,7 @@ function App() {
   }, [mapReady, displayedPools])
 
   useEffect(() => {
-    if (!mapInstanceRef.current) {
+    if (!mapInstanceRef.current || !mapReady) {
       return
     }
 
@@ -420,7 +420,7 @@ function App() {
       element.style.border = isSelected ? '3px solid #10213a' : '2px solid white'
       element.style.transform = 'translate(-50%, -50%)'
     })
-  }, [pools, selectedPool, selectedPoolId])
+  }, [pools, selectedPool, selectedPoolId, mapReady])
 
   const parseApiResponse = async (response: Response) => {
     const text = await response.text()
