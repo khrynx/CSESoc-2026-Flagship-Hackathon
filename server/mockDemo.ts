@@ -32,9 +32,9 @@ export function initMockData() {
     const pool2 = makePool(user1.userId, 'Paper Towels', 'Many rolls of paper towels', 2, 60, daysFromNow(18), 151.2263, -33.8849, 5, 'Health & Wellness');
     const pool3 = makePool(user2.userId, 'Canned Beans', 'A lot of canned beans', 1, 100, daysFromNow(20), 151.2743, -33.8908, 10, 'Pantry & Dry Goods');
     const pool4 = makePool(user3.userId, 'Dog Food', 'Yummy delicious doggy treats!', 3, 80, daysFromNow(24), 151.2069, -33.8708, 5, 'Pet Supplies');
-    const pool5 = makePool(user4.userId, 'Canned Tuna', 'A lot of canned tuna', 2, 70, daysFromNow(16), 151.2743, -33.8908, 10, 'Pantry & Dry Goods');
-    const pool6 = makePool(user5.userId, 'Soccer Balls', 'HAALAND HAALAND', 4, 10, daysFromNow(22), 151.2263, -33.8849, 5, 'Sports & Outdoors');
-    const pool7 = makePool(user6.userId, 'Hot Wheels', 'Good ol\' Hot Wheels', 3, 40, daysFromNow(28), 151.0574, -33.9443, 20, 'Toys & Games');
+    const pool5 = makePool(user4.userId, 'Canned Tuna', 'A lot of canned tuna', 2, 70, daysFromNow(16), 151.2840, -33.9120, 10, 'Pantry & Dry Goods');
+    const pool6 = makePool(user5.userId, 'Soccer Balls', 'HAALAND HAALAND', 4, 10, daysFromNow(22), 151.1890, -33.9310, 5, 'Sports & Outdoors');
+    const pool7 = makePool(user6.userId, 'Hot Wheels', 'Good ol\' Hot Wheels', 3, 40, daysFromNow(28), 151.1320, -33.8650, 20, 'Toys & Games');
 
     // Create host mock reviews
     // addReview(userId: string, revieweeId: string, rating: number, comment: string)
@@ -82,69 +82,69 @@ export function initMockData() {
     // Join some participants to pools
     let req;
 
-    req = joinPool(user2.userId, pool1.id, 5);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user13.userId, pool1.id, 40);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user3.userId, pool1.id, 3);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user17.userId, pool1.id, 4);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user4.userId, pool1.id, 7);
-    acceptRequest(req.requestId, user1.userId);
+    req = joinPool(user2.userId, pool1.id, 3);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user13.userId, pool1.id, 5);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user3.userId, pool1.id, 2);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user17.userId, pool1.id, 2);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user4.userId, pool1.id, 3);
+    acceptRequest(user1.userId, req.requestId);
 
     req = joinPool(user3.userId, pool2.id, 2);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user4.userId, pool2.id, 4);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user5.userId, pool2.id, 5);
-    acceptRequest(req.requestId, user1.userId);
-    req = joinPool(user6.userId, pool2.id, 2);
-    acceptRequest(req.requestId, user1.userId);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user4.userId, pool2.id, 2);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user5.userId, pool2.id, 3);
+    acceptRequest(user1.userId, req.requestId);
+    req = joinPool(user6.userId, pool2.id, 1);
+    acceptRequest(user1.userId, req.requestId);
 
-    req = joinPool(user5.userId, pool3.id, 10);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user6.userId, pool3.id, 12);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user12.userId, pool3.id, 13);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user14.userId, pool3.id, 5);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user1.userId, pool3.id, 20);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user9.userId, pool3.id, 15);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user11.userId, pool3.id, 3);
-    acceptRequest(req.requestId, user2.userId);
+    req = joinPool(user5.userId, pool3.id, 8);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user6.userId, pool3.id, 6);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user12.userId, pool3.id, 7);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user14.userId, pool3.id, 4);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user1.userId, pool3.id, 5);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user9.userId, pool3.id, 3);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user11.userId, pool3.id, 2);
+    acceptRequest(user2.userId, req.requestId);
 
-    req = joinPool(user7.userId, pool4.id, 20);
-    acceptRequest(req.requestId, user3.userId);
-    req = joinPool(user8.userId, pool4.id, 15);
-    acceptRequest(req.requestId, user3.userId);
-    req = joinPool(user15.userId, pool4.id, 4);
-    acceptRequest(req.requestId, user3.userId);
-    req = joinPool(user16.userId, pool4.id, 5);
-    acceptRequest(req.requestId, user3.userId);
+    req = joinPool(user7.userId, pool4.id, 8);
+    acceptRequest(user3.userId, req.requestId);
+    req = joinPool(user8.userId, pool4.id, 6);
+    acceptRequest(user3.userId, req.requestId);
+    req = joinPool(user15.userId, pool4.id, 2);
+    acceptRequest(user3.userId, req.requestId);
+    req = joinPool(user16.userId, pool4.id, 3);
+    acceptRequest(user3.userId, req.requestId);
 
-    req = joinPool(user9.userId, pool5.id, 5);
-    acceptRequest(req.requestId, user4.userId);
-    req = joinPool(user10.userId, pool5.id, 3);
-    acceptRequest(req.requestId, user4.userId);
+    req = joinPool(user9.userId, pool5.id, 3);
+    acceptRequest(user4.userId, req.requestId);
+    req = joinPool(user10.userId, pool5.id, 2);
+    acceptRequest(user4.userId, req.requestId);
 
-    req = joinPool(user12.userId, pool6.id, 2);
-    acceptRequest(req.requestId, user5.userId);
+    req = joinPool(user12.userId, pool6.id, 1);
+    acceptRequest(user5.userId, req.requestId);
     req = joinPool(user13.userId, pool6.id, 1);
-    acceptRequest(req.requestId, user5.userId);
+    acceptRequest(user5.userId, req.requestId);
 
-    req = joinPool(user14.userId, pool7.id, 3);
-    acceptRequest(req.requestId, user6.userId);
+    req = joinPool(user14.userId, pool7.id, 2);
+    acceptRequest(user6.userId, req.requestId);
 
     // Special mock data for demonstration purposes
-    const specialPool = makePool(user2.userId, 'Special Pool (wow)', 'This is a special pool for demonstration purposes. Fulfill me!!', 5, 20, daysFromNow(10), 151.2000, -33.9000, 5, 'Other');
-    req = joinPool(user1.userId, specialPool.id, 10);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user3.userId, specialPool.id, 5);
-    acceptRequest(req.requestId, user2.userId);
-    req = joinPool(user4.userId, specialPool.id, 2);
-    acceptRequest(req.requestId, user2.userId);
+    const specialPool = makePool(user2.userId, 'Special Pool (wow)', 'This is a special pool for demonstration purposes. Fulfill me!!', 5, 20, daysFromNow(10), 151.1540, -33.9020, 5, 'Other');
+    req = joinPool(user1.userId, specialPool.id, 3);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user3.userId, specialPool.id, 2);
+    acceptRequest(user2.userId, req.requestId);
+    req = joinPool(user4.userId, specialPool.id, 1);
+    acceptRequest(user2.userId, req.requestId);
 }
