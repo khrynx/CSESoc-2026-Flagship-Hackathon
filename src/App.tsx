@@ -148,6 +148,15 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeSearchQuery, setActiveSearchQuery] = useState('')
   const [distanceFilter, setDistanceFilter] = useState('')
+  const [showMapAdvancedSearch, setShowMapAdvancedSearch] = useState(false)
+  const [mapAdvancedFilters, setMapAdvancedFilters] = useState({
+    category: '',
+    price: '',
+    size: '',
+    fullness: '',
+    rating: '',
+    deadlineDays: '',
+  })
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [homeSearchQuery, setHomeSearchQuery] = useState('')
   const [homeDistanceFilter, setHomeDistanceFilter] = useState('')
@@ -217,6 +226,15 @@ function App() {
       homeAdvancedFilters.deadlineDays,
   )
 
+  const hasMapAdvancedFilters = Boolean(
+    mapAdvancedFilters.category ||
+      mapAdvancedFilters.price ||
+      mapAdvancedFilters.size ||
+      mapAdvancedFilters.fullness ||
+      mapAdvancedFilters.rating ||
+      mapAdvancedFilters.deadlineDays,
+  )
+
   useEffect(() => {
     if (!navigator.geolocation) {
       return
@@ -261,7 +279,7 @@ function App() {
 
         setPools(latestPools)
 
-        if (!activeSearchQuery && !distanceFilter) {
+        if (!activeSearchQuery && !distanceFilter && !hasMapAdvancedFilters) {
           setDisplayedPools(latestPools)
         }
 
@@ -299,13 +317,22 @@ function App() {
         }
       }
 
-      if (!activeSearchQuery && !distanceFilter) {
+      if (!activeSearchQuery && !distanceFilter && !hasMapAdvancedFilters) {
         return
       }
 
       try {
         const params = new URLSearchParams()
         if (activeSearchQuery) params.set('q', activeSearchQuery)
+        if (mapAdvancedFilters.category) params.set('category', mapAdvancedFilters.category)
+        if (mapAdvancedFilters.price) params.set('price', mapAdvancedFilters.price)
+        if (mapAdvancedFilters.size) params.set('size', mapAdvancedFilters.size)
+        if (mapAdvancedFilters.fullness) params.set('fullness', mapAdvancedFilters.fullness)
+        if (mapAdvancedFilters.rating) params.set('rating', mapAdvancedFilters.rating)
+        if (mapAdvancedFilters.deadlineDays) {
+          const deadlineBefore = new Date(Date.now() + Number(mapAdvancedFilters.deadlineDays) * 24 * 60 * 60 * 1000)
+          params.set('deadlineBefore', deadlineBefore.toISOString())
+        }
         if (distanceFilter && userLocation) {
           params.set('distance', (Number(distanceFilter) / 111).toFixed(6))
           params.set('lng', String(userLocation.lng))
@@ -332,7 +359,17 @@ function App() {
       cancelled = true
       window.clearInterval(pollId)
     }
-  }, [activeSearchQuery, distanceFilter, hasHomeAdvancedFilters, homeAdvancedFilters, homeSearchQuery, homeDistanceFilter, userLocation])
+  }, [
+    activeSearchQuery,
+    distanceFilter,
+    hasHomeAdvancedFilters,
+    homeAdvancedFilters,
+    homeSearchQuery,
+    homeDistanceFilter,
+    hasMapAdvancedFilters,
+    mapAdvancedFilters,
+    userLocation,
+  ])
 
   useEffect(() => {
     if (!currentUser?.userId) {
@@ -487,13 +524,22 @@ function App() {
 
   useEffect(() => {
     const run = async () => {
-      if (!activeSearchQuery && !distanceFilter) {
+      if (!activeSearchQuery && !distanceFilter && !hasMapAdvancedFilters) {
         setDisplayedPools(pools)
         return
       }
       try {
         const params = new URLSearchParams()
         if (activeSearchQuery) params.set('q', activeSearchQuery)
+        if (mapAdvancedFilters.category) params.set('category', mapAdvancedFilters.category)
+        if (mapAdvancedFilters.price) params.set('price', mapAdvancedFilters.price)
+        if (mapAdvancedFilters.size) params.set('size', mapAdvancedFilters.size)
+        if (mapAdvancedFilters.fullness) params.set('fullness', mapAdvancedFilters.fullness)
+        if (mapAdvancedFilters.rating) params.set('rating', mapAdvancedFilters.rating)
+        if (mapAdvancedFilters.deadlineDays) {
+          const deadlineBefore = new Date(Date.now() + Number(mapAdvancedFilters.deadlineDays) * 24 * 60 * 60 * 1000)
+          params.set('deadlineBefore', deadlineBefore.toISOString())
+        }
         if (distanceFilter && userLocation) {
           params.set('distance', (Number(distanceFilter) / 111).toFixed(6))
           params.set('lng', String(userLocation.lng))
@@ -510,7 +556,7 @@ function App() {
       }
     }
     run()
-  }, [activeSearchQuery, distanceFilter, pools, userLocation])
+  }, [activeSearchQuery, distanceFilter, hasMapAdvancedFilters, mapAdvancedFilters, pools, userLocation])
 
   useEffect(() => {
     if (!homeSearchQuery.trim() && !homeDistanceFilter && !hasHomeAdvancedFilters) {
@@ -1160,33 +1206,6 @@ function App() {
           <div className="brand-badge">N</div>
           <span className="brand-name">Neighbourly</span>
         </div>
-        <form
-          className="search-bar"
-          onSubmit={(e) => { e.preventDefault(); setActiveSearchQuery(searchQuery) }}
-        >
-          <input
-            type="search"
-            className="search-input"
-            placeholder="Search pools…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button type="submit" className="search-btn">Search</button>
-          <select
-            className="distance-select"
-            value={distanceFilter}
-            onChange={(e) => setDistanceFilter(e.target.value)}
-            disabled={!userLocation}
-            title={userLocation ? 'Filter by distance from your location' : 'Allow location access to filter by distance'}
-          >
-            <option value="">Any distance</option>
-            <option value="1">Within 1 km</option>
-            <option value="2">Within 2 km</option>
-            <option value="5">Within 5 km</option>
-            <option value="10">Within 10 km</option>
-            <option value="25">Within 25 km</option>
-          </select>
-        </form>
         <div className="topbar-actions">
           <button type="button" className="ghost-btn" onClick={() => setView('home')}>
             ← Home
@@ -1211,57 +1230,174 @@ function App() {
           ↺
         </button>
 
-        {/* Search results popup – top center */}
-        {showSearchResults && (
-          <aside className="popup popup-search-results">
-            <div className="popup-header">
-              <h3>
-                {displayedPools.length === 0
-                  ? 'No results'
-                  : `${displayedPools.length} pool${displayedPools.length === 1 ? '' : 's'} found`}
-              </h3>
-              <button
-                type="button"
-                className="popup-close"
-                onClick={() => {
-                  setShowSearchResults(false)
-                  setActiveSearchQuery('')
-                  setSearchQuery('')
-                  setDistanceFilter('')
-                }}
+        <div className="map-search-stack">
+          <div className="map-search-island">
+            <div className="map-search-cluster">
+              <form
+                className="search-bar"
+                onSubmit={(e) => { e.preventDefault(); setActiveSearchQuery(searchQuery) }}
               >
-                ✕
-              </button>
-            </div>
-            <div className="popup-body">
-              {displayedPools.length === 0 ? (
-                <p className="pool-desc">Try a different search term or distance.</p>
-              ) : (
-                <ul className="search-result-list">
-                  {displayedPools.map((pool) => {
-                    const joined = isCurrentUserInPool(pool)
-                    return (
-                      <li
-                        key={pool.id}
-                        className={`search-result-item${joined ? ' joined' : ''}`}
-                        onClick={() => {
-                          setSelectedPoolId(pool.id)
-                          setSelectedLocation(null)
-                          setShowSearchResults(false)
-                        }}
-                      >
-                        <strong>{pool.itemName}</strong>
-                        <span>{pool.desc}</span>
-                        {joined ? <span className="joined-pill">Already joined</span> : null}
-                        <span className="result-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
-                      </li>
-                    )
-                  })}
-                </ul>
+                <input
+                  type="search"
+                  className="search-input"
+                  placeholder="Search pools…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button type="submit" className="search-btn">Search</button>
+                <button
+                  type="button"
+                  className={`filter-btn${showMapAdvancedSearch ? ' active' : ''}`}
+                  onClick={() => setShowMapAdvancedSearch((current) => !current)}
+                  title="Advanced filters"
+                  aria-label="Toggle advanced filters"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z" />
+                  </svg>
+                </button>
+              </form>
+
+              {showMapAdvancedSearch && (
+                <div className="map-advanced-panel">
+                  <select
+                    className="map-advanced-select"
+                    value={distanceFilter}
+                    onChange={(e) => setDistanceFilter(e.target.value)}
+                    disabled={!userLocation}
+                    title={userLocation ? 'Filter by distance from your location' : 'Allow location access to filter by distance'}
+                  >
+                    <option value="">Any distance</option>
+                    <option value="1">Within 1 km</option>
+                    <option value="2">Within 2 km</option>
+                    <option value="5">Within 5 km</option>
+                    <option value="10">Within 10 km</option>
+                    <option value="25">Within 25 km</option>
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.category}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, category: e.target.value }))}
+                  >
+                    <option value="">Any category</option>
+                    {poolCategories.map((category) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.price}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, price: e.target.value }))}
+                  >
+                    <option value="">Any price</option>
+                    <option value="5">Up to $5</option>
+                    <option value="10">Up to $10</option>
+                    <option value="20">Up to $20</option>
+                    <option value="50">Up to $50</option>
+                    <option value="100">Up to $100</option>
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.size}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, size: e.target.value }))}
+                  >
+                    <option value="">Any size</option>
+                    <option value="5">Up to 5 units</option>
+                    <option value="10">Up to 10 units</option>
+                    <option value="20">Up to 20 units</option>
+                    <option value="50">Up to 50 units</option>
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.fullness}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, fullness: e.target.value }))}
+                  >
+                    <option value="">Any fullness</option>
+                    <option value="0.25">Up to 25% filled</option>
+                    <option value="0.5">Up to 50% filled</option>
+                    <option value="0.75">Up to 75% filled</option>
+                    <option value="1">Any open pool</option>
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.rating}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, rating: e.target.value }))}
+                  >
+                    <option value="">Any host rating</option>
+                    <option value="5">5.0+</option>
+                    <option value="4">4.0+</option>
+                    <option value="3">3.0+</option>
+                    <option value="2">2.0+</option>
+                  </select>
+                  <select
+                    className="map-advanced-select"
+                    value={mapAdvancedFilters.deadlineDays}
+                    onChange={(e) => setMapAdvancedFilters((current) => ({ ...current, deadlineDays: e.target.value }))}
+                  >
+                    <option value="">Any deadline</option>
+                    <option value="1">Within 24 hours</option>
+                    <option value="3">Within 3 days</option>
+                    <option value="7">Within 7 days</option>
+                    <option value="14">Within 14 days</option>
+                    <option value="30">Within 30 days</option>
+                  </select>
+                </div>
               )}
             </div>
-          </aside>
-        )}
+          </div>
+
+          {/* Search results popup – under search island */}
+          {showSearchResults && (
+            <aside className="popup popup-search-results">
+              <div className="popup-header">
+                <h3>
+                  {displayedPools.length === 0
+                    ? 'No results'
+                    : `${displayedPools.length} pool${displayedPools.length === 1 ? '' : 's'} found`}
+                </h3>
+                <button
+                  type="button"
+                  className="popup-close"
+                  onClick={() => {
+                    setShowSearchResults(false)
+                    setActiveSearchQuery('')
+                    setSearchQuery('')
+                    setDistanceFilter('')
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="popup-body">
+                {displayedPools.length === 0 ? (
+                  <p className="pool-desc">Try a different search term or distance.</p>
+                ) : (
+                  <ul className="search-result-list">
+                    {displayedPools.map((pool) => {
+                      const joined = isCurrentUserInPool(pool)
+                      return (
+                        <li
+                          key={pool.id}
+                          className={`search-result-item${joined ? ' joined' : ''}`}
+                          onClick={() => {
+                            setSelectedPoolId(pool.id)
+                            setSelectedLocation(null)
+                            setShowSearchResults(false)
+                          }}
+                        >
+                          <strong>{pool.itemName}</strong>
+                          <span>{pool.desc}</span>
+                          {joined ? <span className="joined-pill">Already joined</span> : null}
+                          <span className="result-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </aside>
+          )}
+        </div>
 
         {/* Create pool popup – top left */}
         {selectedLocation && (
