@@ -22,18 +22,3 @@ export function getHostingPools(userId: string): Pool[] {
     return user.hostingPools;
 }
 
-// Gets host details of a pool
-export function getHost(poolId: string): Participant {
-    const data = getData();
-    const pool = data.globalPools.find(pool => pool.id === poolId);
-
-    if (!pool) {
-        throw new Error("Pool not found");
-    }
-
-    if (pool.participants.length === 0) {
-        throw new Error("No participants in the pool");
-    }
-
-    return pool.participants[0]; // Return the host (first participant)
-}
