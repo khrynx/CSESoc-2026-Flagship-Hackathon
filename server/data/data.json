@@ -6,7 +6,11 @@
       "email": "demo@example.com",
       "password": "$2b$10$5Jq7rw8hQeuYKIAdWXpJzuJuWH0foHvS0gE7Fw7O54OcP7EBlhuhm",
       "phoneNumber": "0400000000",
-      "pools": []
+      "pools": [],
+      "hostingPools": [],
+      "participatingPools": [],
+      "hostReviews": [],
+      "participantReviews": []
     },
     {
       "userId": "dez7v6c44",
@@ -14,7 +18,53 @@
       "email": "k3vin.j.li@gmail.com",
       "password": "$2b$10$YQPrQ2Qh2QumB1gYpBkX1.dGkb3yoShT4dBDq8cxseX8jIzJpLZOa",
       "phoneNumber": "1",
-      "pools": []
+      "pools": [
+        {
+          "id": "7f0ucerfm",
+          "itemName": "Ethan Hendra",
+          "desc": "hes dumb",
+          "price": 69,
+          "quantityGoal": 999,
+          "currentTotal": 0,
+          "deadline": "2026-07-31T11:52:00.000Z",
+          "longitude": 151.207309,
+          "latitude": -33.87428,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            }
+          ],
+          "category": "Snacks"
+        }
+      ],
+      "hostingPools": [
+        {
+          "id": "7f0ucerfm",
+          "itemName": "Ethan Hendra",
+          "desc": "hes dumb",
+          "price": 69,
+          "quantityGoal": 999,
+          "currentTotal": 0,
+          "deadline": "2026-07-31T11:52:00.000Z",
+          "longitude": 151.207309,
+          "latitude": -33.87428,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            }
+          ],
+          "category": "Snacks"
+        }
+      ],
+      "participatingPools": [],
+      "hostReviews": [],
+      "participantReviews": []
     },
     {
       "userId": "vazskm12l",
@@ -22,7 +72,11 @@
       "email": "yeetusdeletusmcfeetus@gmail.com",
       "password": "$2b$10$CIpyfpdBHr5nMcGhuocOUu2qAEia4Wrz68uADecYmK7WFFlA55pBS",
       "phoneNumber": "2",
-      "pools": []
+      "pools": [],
+      "hostingPools": [],
+      "participatingPools": [],
+      "hostReviews": [],
+      "participantReviews": []
     }
   ],
   "globalPools": [
@@ -50,6 +104,26 @@
           "phoneNumber": "0400000000"
         }
       ]
+    },
+    {
+      "id": "7f0ucerfm",
+      "itemName": "Ethan Hendra",
+      "desc": "hes dumb",
+      "price": 69,
+      "quantityGoal": 999,
+      "currentTotal": 0,
+      "deadline": "2026-07-31T11:52:00.000Z",
+      "longitude": 151.207309,
+      "latitude": -33.87428,
+      "participants": [
+        {
+          "userId": "dez7v6c44",
+          "username": "Kevin Li",
+          "quantity": 1,
+          "phoneNumber": "1"
+        }
+      ],
+      "category": "Snacks"
     }
   ],
   "sessions": [
@@ -60,6 +134,10 @@
     {
       "sessionId": "ccerafubn",
       "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "if3r95qej",
+      "userId": "dez7v6c44"
     }
   ]
 }

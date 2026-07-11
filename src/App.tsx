@@ -37,6 +37,23 @@ type Pool = {
   participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
 }
 
+const poolCategories = [
+  'Clothing',
+  'Beverages',
+  'Fresh Produce',
+  'Pantry & Dry Goods',
+  'Snacks',
+  'Home & Garden',
+  'Household Essentials',
+  'Sports & Outdoors',
+  'Toys & Games',
+  'Pet Supplies',
+  'Health & Wellness',
+  'Baby & Kids',
+  'School & Office Supplies',
+  'Other',
+] as const
+
 const normalMapStyleUrl = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 const groupBuys: GroupBuy[] = [
@@ -105,6 +122,7 @@ function App() {
   const [authMessage, setAuthMessage] = useState('')
   const [currentUser, setCurrentUser] = useState<{ userId: string; username: string; email: string } | null>(null)
   const [poolForm, setPoolForm] = useState({
+    category: '',
     itemName: '',
     desc: '',
     price: '',
@@ -419,7 +437,7 @@ function App() {
     setSignupData((current) => ({ ...current, [name]: value }))
   }
 
-  const handlePoolFormChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handlePoolFormChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target
     setPoolForm((current) => ({ ...current, [name]: value }))
   }
@@ -438,6 +456,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: currentUser?.userId,
+          category: poolForm.category,
           itemName: poolForm.itemName,
           desc: poolForm.desc,
           price: Number(poolForm.price),
@@ -461,6 +480,7 @@ function App() {
         setPools((current) => [...current, createdPool])
       }
       setPoolForm({
+        category: '',
         itemName: '',
         desc: '',
         price: '',
@@ -864,6 +884,15 @@ function App() {
               </button>
             </div>
             <form className="popup-form" onSubmit={handlePoolSubmit}>
+              <label className="input-group">
+                <span>Category</span>
+                <select name="category" value={poolForm.category} onChange={handlePoolFormChange} required>
+                  <option value="" disabled>Select a category</option>
+                  {poolCategories.map((category) => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </label>
               <label className="input-group">
                 <span>Item name</span>
                 <input name="itemName" value={poolForm.itemName} onChange={handlePoolFormChange} required />

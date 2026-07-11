@@ -93,8 +93,28 @@ function createDefaultData(): Data {
 function normalizeData(rawData: Partial<Data> | null | undefined): Data {
     const parsed = rawData ?? createDefaultData();
 
+    const normalizedUsers = Array.isArray(parsed.users)
+        ? parsed.users.map((user) => ({
+            ...user,
+            hostingPools: Array.isArray((user as Partial<User> & { pools?: Pool[] }).hostingPools)
+                ? (user as Partial<User> & { hostingPools?: Pool[] }).hostingPools ?? []
+                : Array.isArray((user as Partial<User> & { pools?: Pool[] }).pools)
+                    ? ((user as Partial<User> & { pools?: Pool[] }).pools ?? [])
+                    : [],
+            participatingPools: Array.isArray((user as Partial<User>).participatingPools)
+                ? (user as Partial<User>).participatingPools ?? []
+                : [],
+            hostReviews: Array.isArray((user as Partial<User>).hostReviews)
+                ? (user as Partial<User>).hostReviews ?? []
+                : [],
+            participantReviews: Array.isArray((user as Partial<User>).participantReviews)
+                ? (user as Partial<User>).participantReviews ?? []
+                : [],
+        }))
+        : [];
+
     return {
-        users: Array.isArray(parsed.users) ? parsed.users : [],
+        users: normalizedUsers,
         globalPools: Array.isArray(parsed.globalPools)
             ? parsed.globalPools.map((pool) => ({
                 ...pool,
