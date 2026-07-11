@@ -172,6 +172,20 @@ function App() {
     })
   }, [selectedBuy])
 
+  const parseApiResponse = async (response: Response) => {
+    const text = await response.text()
+
+    if (!text) {
+      return {}
+    }
+
+    try {
+      return JSON.parse(text)
+    } catch {
+      return { message: text }
+    }
+  }
+
   const handleLoginChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
     setLoginData((current) => ({ ...current, [name]: value }))
@@ -200,7 +214,7 @@ function App() {
         }),
       })
 
-      const data = await response.json()
+      const data = await parseApiResponse(response)
 
       if (!response.ok) {
         throw new Error(data.message || 'Unable to sign in right now.')
@@ -229,7 +243,7 @@ function App() {
         body: JSON.stringify(signupData),
       })
 
-      const data = await response.json()
+      const data = await parseApiResponse(response)
 
       if (!response.ok) {
         throw new Error(data.message || 'Unable to create account right now.')
