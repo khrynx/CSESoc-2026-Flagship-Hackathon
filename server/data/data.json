@@ -7,6 +7,14 @@
       "password": "$2b$10$5Jq7rw8hQeuYKIAdWXpJzuJuWH0foHvS0gE7Fw7O54OcP7EBlhuhm",
       "phoneNumber": "0400000000",
       "pools": []
+    },
+    {
+      "userId": "dez7v6c44",
+      "username": "Kevin Li",
+      "email": "k3vin.j.li@gmail.com",
+      "password": "$2b$10$YQPrQ2Qh2QumB1gYpBkX1.dGkb3yoShT4dBDq8cxseX8jIzJpLZOa",
+      "phoneNumber": "1",
+      "pools": []
     }
   ],
   "globalPools": [],
