@@ -127,7 +127,8 @@ function App() {
     desc: '',
     price: '',
     quantityGoal: '',
-    deadline: '',
+    deadlineDate: '',
+    deadlineTime: '',
     longitude: '',
     latitude: '',
     hostquantity: '',
@@ -442,11 +443,60 @@ function App() {
     setPoolForm((current) => ({ ...current, [name]: value }))
   }
 
+  const parseDeadlineInput = (dateInput: string, timeInput: string): Date | null => {
+    const match = dateInput.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/)
+    if (!match) {
+      return null
+    }
+
+    const timeMatch = timeInput.trim().match(/^(\d{2}):(\d{2})$/)
+    if (!timeMatch) {
+      return null
+    }
+
+    const year = Number(match[1])
+    const month = Number(match[2])
+    const day = Number(match[3])
+    const hour = Number(timeMatch[1])
+    const minute = Number(timeMatch[2])
+    const parsed = new Date(year, month - 1, day, hour, minute, 0, 0)
+
+    if (
+      parsed.getFullYear() !== year ||
+      parsed.getMonth() !== month - 1 ||
+      parsed.getDate() !== day ||
+      parsed.getHours() !== hour ||
+      parsed.getMinutes() !== minute
+    ) {
+      return null
+    }
+
+    return parsed
+  }
+
   const handlePoolSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (!currentUser?.userId) {
       setPoolMessage('Please sign in before creating a pool.')
+      return
+    }
+
+    const deadlineDate = parseDeadlineInput(poolForm.deadlineDate, poolForm.deadlineTime)
+    if (!deadlineDate) {
+      setPoolMessage('Deadline date/time is invalid. Use date picker and enter time as HH:mm.')
+      return
+    }
+
+    const now = new Date()
+    const maxDeadline = new Date(now.getTime() + 50 * 24 * 60 * 60 * 1000)
+    if (deadlineDate <= now) {
+      setPoolMessage('Deadline must be in the future.')
+      return
+    }
+
+    if (deadlineDate > maxDeadline) {
+      setPoolMessage('Deadline must be within 50 days from now.')
       return
     }
 
@@ -461,7 +511,7 @@ function App() {
           desc: poolForm.desc,
           price: Number(poolForm.price),
           quantityGoal: Number(poolForm.quantityGoal),
-          deadline: poolForm.deadline,
+          deadline: deadlineDate.toISOString(),
           longitude: Number(poolForm.longitude),
           latitude: Number(poolForm.latitude),
           hostquantity: Number(poolForm.hostquantity),
@@ -485,7 +535,8 @@ function App() {
         desc: '',
         price: '',
         quantityGoal: '',
-        deadline: '',
+        deadlineDate: '',
+        deadlineTime: '',
         longitude: '',
         latitude: '',
         hostquantity: '',
@@ -509,9 +560,52 @@ function App() {
         throw new Error(data.message || 'Unable to join pool.')
       }
 
+      if (data.removed || !data.pool) {
+        setPools((current) => current.filter((pool) => pool.id !== poolId))
+        setDisplayedPools((current) => current.filter((pool) => pool.id !== poolId))
+        setSelectedPoolId(null)
+        setPoolMessage('Joined successfully. Pool is now fulfilled/closed and has been removed.')
+        return
+      }
+
+      const updatedPool = data.pool as Pool
+      setPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
+      setDisplayedPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
+      setSelectedPoolId(updatedPool.id)
       setPoolMessage('Joined pool successfully.')
     } catch (error) {
       setPoolMessage(error instanceof Error ? error.message : 'Unable to join pool.')
+    }
+  }
+
+  const handleRedoReset = async () => {
+    const confirmed = window.confirm('Reset all app data? This will delete all users and pools.')
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/reset', {
+        method: 'POST',
+      })
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to reset data.')
+      }
+
+      setPools(Array.isArray(data.pools) ? data.pools : [])
+      setDisplayedPools(Array.isArray(data.pools) ? data.pools : [])
+      setSelectedPoolId(null)
+      setSelectedLocation(null)
+      setPoolMessage('Data reset complete.')
+      if (selectedLocationMarkerRef.current) {
+        selectedLocationMarkerRef.current.remove()
+        selectedLocationMarkerRef.current = null
+      }
+      retryMap('manual')
+    } catch (error) {
+      setPoolMessage(error instanceof Error ? error.message : 'Unable to reset data.')
     }
   }
 
@@ -761,6 +855,9 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand-row">
+          <button type="button" className="ghost-btn" onClick={handleRedoReset}>
+            Reset data
+          </button>
           <div className="brand-badge">N</div>
           <span className="brand-name">Neighbourly</span>
         </div>
@@ -914,9 +1011,27 @@ function App() {
                 <input name="hostquantity" type="number" min="1" value={poolForm.hostquantity} onChange={handlePoolFormChange} required />
               </label>
               <label className="input-group">
-                <span>Deadline</span>
-                <input name="deadline" type="datetime-local" value={poolForm.deadline} onChange={handlePoolFormChange} required />
+                <span>Deadline date</span>
+                <input
+                  name="deadlineDate"
+                  type="date"
+                  value={poolForm.deadlineDate}
+                  onChange={handlePoolFormChange}
+                  required
+                />
               </label>
+              <label className="input-group">
+                <span>Deadline time</span>
+                <input
+                  name="deadlineTime"
+                  type="text"
+                  placeholder="HH:mm"
+                  value={poolForm.deadlineTime}
+                  onChange={handlePoolFormChange}
+                  required
+                />
+              </label>
+              <p className="location-hint">Select date, then enter local time as HH:mm (24-hour, max 50 days from now)</p>
               <p className="location-hint">📍 {Number(poolForm.latitude).toFixed(4)}, {Number(poolForm.longitude).toFixed(4)}</p>
               <button type="submit" className="primary-btn">Create pool</button>
               {poolMessage && <p className="form-message success">{poolMessage}</p>}

@@ -1,10 +1,15 @@
 import express from 'express'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
-import { getData } from './dataStore.js'
+import { cleanupInactivePools, getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
 import { searchPools } from './search.js'
 
 const router = express.Router()
+
+router.use((_req, _res, next) => {
+  cleanupInactivePools()
+  next()
+})
 
 router.get('/pools', (_req, res) => {
   try {
@@ -12,6 +17,15 @@ router.get('/pools', (_req, res) => {
     res.json({ pools: globalPools })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load pools.' })
+  }
+})
+
+router.post('/reset', (_req, res) => {
+  try {
+    const data = resetData()
+    res.json({ message: 'Data reset successfully.', pools: data.globalPools })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to reset data.' })
   }
 })
 
@@ -80,8 +94,8 @@ router.post('/pools/:poolId/join', (req, res) => {
       return
     }
 
-    const pool = joinPool(userId, req.params.poolId, Number(quantity))
-    res.json({ pool })
+    const result = joinPool(userId, req.params.poolId, Number(quantity))
+    res.json(result)
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to join pool.' })
   }
