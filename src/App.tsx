@@ -24,6 +24,19 @@ type GroupBuy = {
   }
 }
 
+type Pool = {
+  id: string
+  itemName: string
+  desc: string
+  price: number
+  quantityGoal: number
+  currentTotal: number
+  deadline: string
+  longitude: number
+  latitude: number
+  participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
+}
+
 const normalMapStyleUrl = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 const groupBuys: GroupBuy[] = [
@@ -109,45 +122,12 @@ function App() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [homeSearchQuery, setHomeSearchQuery] = useState('')
   const [homeDistanceFilter, setHomeDistanceFilter] = useState('')
-  const [homeSearchResults, setHomeSearchResults] = useState<Array<{
-    id: string
-    itemName: string
-    desc: string
-    price: number
-    quantityGoal: number
-    currentTotal: number
-    deadline: string
-    longitude: number
-    latitude: number
-    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
-  }>>([])
+  const [homeSearchResults, setHomeSearchResults] = useState<Pool[]>([])
   const [showHomeDropdown, setShowHomeDropdown] = useState(false)
-  const [displayedPools, setDisplayedPools] = useState<Array<{
-    id: string
-    itemName: string
-    desc: string
-    price: number
-    quantityGoal: number
-    currentTotal: number
-    deadline: string
-    longitude: number
-    latitude: number
-    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
-  }>>([])
+  const [displayedPools, setDisplayedPools] = useState<Pool[]>([])
   const [selectedLocation, setSelectedLocation] = useState<{ lng: number; lat: number } | null>(null)
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
-  const [pools, setPools] = useState<Array<{
-    id: string
-    itemName: string
-    desc: string
-    price: number
-    quantityGoal: number
-    currentTotal: number
-    deadline: string
-    longitude: number
-    latitude: number
-    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
-  }>>([])
+  const [pools, setPools] = useState<Pool[]>([])
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -158,6 +138,12 @@ function App() {
     () => pools.find((pool) => pool.id === selectedPoolId) ?? null,
     [pools, selectedPoolId],
   )
+
+  const getPoolMarkerColor = (pool: Pool): string => {
+    const fullness = Math.max(0, Math.min(1, pool.currentTotal / pool.quantityGoal))
+    const hue = 120 - fullness * 120
+    return `hsl(${hue}, 85%, 45%)`
+  }
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -382,7 +368,7 @@ function App() {
 
     markersRef.current.forEach((marker) => marker.remove())
     markersRef.current = displayedPools.map((pool) => {
-      const marker = new maplibregl.Marker({ color: '#14b8a6' })
+      const marker = new maplibregl.Marker({ color: getPoolMarkerColor(pool) })
         .setLngLat([pool.longitude, pool.latitude])
         .addTo(map)
 
@@ -407,16 +393,7 @@ function App() {
         essential: true,
       })
     }
-
-    markersRef.current.forEach((marker, index) => {
-      const pool = displayedPools[index]
-      const element = marker.getElement()
-      const isSelected = Boolean(pool && pool.id === selectedPoolId)
-      element.style.width = isSelected ? '18px' : '14px'
-      element.style.height = isSelected ? '18px' : '14px'
-      element.style.border = isSelected ? '3px solid #10213a' : '2px solid white'
-    })
-  }, [pools, selectedPool, selectedPoolId, mapReady])
+  }, [pools, selectedPool, selectedPoolId, mapReady, displayedPools])
 
   const parseApiResponse = async (response: Response) => {
     const text = await response.text()
