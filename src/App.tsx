@@ -773,6 +773,39 @@ function App() {
   if (view === 'home') {
     return (
       <main className="home-page" onClick={() => setShowHomeDropdown(false)}>
+        <aside className="home-my-pools home-my-pools-rail" onClick={(e) => e.stopPropagation()}>
+          <div className="home-my-pools-header">
+            <h3>Your pools</h3>
+            <span>{myParticipantPools.length}</span>
+          </div>
+          {myParticipantPools.length === 0 ? (
+            <p className="home-my-pools-empty">You have not joined any pools yet.</p>
+          ) : (
+            <ul className="home-my-pools-list">
+              {myParticipantPools.map((pool) => {
+                const hostedByMe = isHostedByCurrentUser(pool)
+                return (
+                  <li
+                    key={pool.id}
+                    className={`home-my-pool-item${hostedByMe ? ' hosted' : ''}`}
+                    onClick={() => {
+                      setSelectedPoolId(pool.id)
+                      setView('app')
+                    }}
+                  >
+                    <div className="home-my-pool-top">
+                      <strong>{pool.itemName}</strong>
+                      {hostedByMe ? <span className="home-my-pool-badge">Hosting</span> : <span className="home-my-pool-badge muted">Joined</span>}
+                    </div>
+                    <span>{pool.category ?? 'Uncategorized'}</span>
+                    <span className="dropdown-meta">{pool.quantityGoal - pool.currentTotal} remaining</span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </aside>
+
         <header className="home-topbar">
           <div className="brand-row home-brand">
             <div className="brand-badge">N</div>
@@ -793,7 +826,6 @@ function App() {
           <h1 className="home-title">Find a group buy<br />near you.</h1>
           <p className="home-subtitle">Split bulk purchases with neighbours. Save money, cut waste.</p>
 
-          <div className="home-content-row">
           <div className="home-search-wrapper" onClick={(e) => e.stopPropagation()}>
             <form
               className="home-search-form"
@@ -879,40 +911,6 @@ function App() {
                 {homeCategoryFilters.length > 0 ? ` in ${homeCategoryFilters.join(', ')}` : ''}
               </div>
             )}
-          </div>
-
-          <aside className="home-my-pools" onClick={(e) => e.stopPropagation()}>
-            <div className="home-my-pools-header">
-              <h3>Your pools</h3>
-              <span>{myParticipantPools.length}</span>
-            </div>
-            {myParticipantPools.length === 0 ? (
-              <p className="home-my-pools-empty">You have not joined any pools yet.</p>
-            ) : (
-              <ul className="home-my-pools-list">
-                {myParticipantPools.map((pool) => {
-                  const hostedByMe = isHostedByCurrentUser(pool)
-                  return (
-                    <li
-                      key={pool.id}
-                      className={`home-my-pool-item${hostedByMe ? ' hosted' : ''}`}
-                      onClick={() => {
-                        setSelectedPoolId(pool.id)
-                        setView('app')
-                      }}
-                    >
-                      <div className="home-my-pool-top">
-                        <strong>{pool.itemName}</strong>
-                        {hostedByMe ? <span className="home-my-pool-badge">Hosting</span> : <span className="home-my-pool-badge muted">Joined</span>}
-                      </div>
-                      <span>{pool.category ?? 'Uncategorized'}</span>
-                      <span className="dropdown-meta">{pool.quantityGoal - pool.currentTotal} remaining</span>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </aside>
           </div>
         </div>
       </main>
