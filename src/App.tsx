@@ -415,7 +415,6 @@ function App() {
       element.style.width = isSelected ? '18px' : '14px'
       element.style.height = isSelected ? '18px' : '14px'
       element.style.border = isSelected ? '3px solid #10213a' : '2px solid white'
-      element.style.transform = 'translate(-50%, -50%)'
     })
   }, [pools, selectedPool, selectedPoolId, mapReady])
 
