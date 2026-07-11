@@ -31,6 +31,16 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
     return newPool;
 }
 
+export function getHostingPools(userId: string) {
+    const { users } = getData();
+    const user = users.find((u) => u.userId === userId); 
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return user.hostingPools;
+}
+
 export function cancelPool(userId: string, poolId: string) {
     const { users, globalPools } = getData();
     const globalPoolIndex = globalPools.findIndex((p) => p.id === poolId);

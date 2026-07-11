@@ -28,3 +28,12 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     const londist = (lon2 - lon1);
     return Math.sqrt(latdist * latdist + londist * londist);
 }
+
+export function filterPoolsPrice(distance: number, userLongitude: number, userLatitude: number) {
+  const { globalPools } = getData();
+
+  return globalPools.filter((pool) => {
+    const distanceToPool = calculateDistance(userLatitude, userLongitude, pool.latitude, pool.longitude);
+    return distanceToPool <= distance;
+  })
+}

@@ -1,7 +1,7 @@
 import express from 'express'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { getData } from './dataStore.js'
-import { getHost, getParticipants, joinPool, leavePool, returnUserPools } from './ParticipantPoolHandle.js'
+import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
 import { searchPools } from './search.js'
 
 const router = express.Router()
@@ -120,7 +120,7 @@ router.get('/pools/:poolId/host', (req, res) => {
 
 router.get('/users/:userId/pools', (req, res) => {
   try {
-    res.json({ pools: returnUserPools(req.params.userId) })
+    res.json({ pools: getUserParticipantPools(req.params.userId) })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user pools.' })
   }
