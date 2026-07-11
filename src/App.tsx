@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import './App.css'
@@ -82,6 +82,9 @@ function App() {
   const [selectedId, setSelectedId] = useState(1)
   const [mapReady, setMapReady] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [view, setView] = useState<'app' | 'login'>('app')
+  const [loginData, setLoginData] = useState({ email: '', password: '' })
+  const [loginMessage, setLoginMessage] = useState('')
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -167,6 +170,64 @@ function App() {
     })
   }, [selectedBuy])
 
+  const handleLoginChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setLoginData((current) => ({ ...current, [name]: value }))
+  }
+
+  const handleLoginSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!loginData.email || !loginData.password) {
+      setLoginMessage('Please enter both your email and password.')
+      return
+    }
+
+    setLoginMessage(`Welcome back, ${loginData.email}!`)
+  }
+
+  if (view === 'login') {
+    return (
+      <main className="auth-page">
+        <section className="auth-card">
+          <div className="auth-hero">
+            <div className="brand-row">
+              <div className="brand-badge">N</div>
+              <span>Neighbourly</span>
+            </div>
+            <h1>Welcome back</h1>
+            <p>Log in to see local group buys, manage your shares, and keep your community updates close by.</p>
+          </div>
+
+          <form className="auth-form" onSubmit={handleLoginSubmit}>
+            <h2>Log in</h2>
+            <p className="auth-intro">Sign in to continue</p>
+
+            <label className="input-group">
+              <span>Email address</span>
+              <input name="email" type="email" placeholder="you@example.com" value={loginData.email} onChange={handleLoginChange} />
+            </label>
+
+            <label className="input-group">
+              <span>Password</span>
+              <input name="password" type="password" placeholder="Enter your password" value={loginData.password} onChange={handleLoginChange} />
+            </label>
+
+            <button type="submit" className="primary-btn">
+              Sign in
+            </button>
+
+            {loginMessage ? <p className="form-message success">{loginMessage}</p> : null}
+
+            <p className="auth-link">
+              Need an account? <a href="#" onClick={() => setView('app')}>Back to home</a>
+            </p>
+          </form>
+        </section>
+      </main>
+    )
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -174,9 +235,14 @@ function App() {
           <p className="eyebrow">Local community bulk-buying</p>
           <h1>Neighbourly</h1>
         </div>
-        <button type="button" className="ghost-btn">
-          Create group buy
-        </button>
+        <div className="topbar-actions">
+          <button type="button" className="ghost-btn" onClick={() => setView('login')}>
+            Log in
+          </button>
+          <button type="button" className="ghost-btn">
+            Create group buy
+          </button>
+        </div>
       </header>
 
       <section className="hero-card">
