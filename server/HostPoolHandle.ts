@@ -8,6 +8,10 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
         throw new Error('User not found');
     }
 
+    if (hostquantity > quantityGoal) {
+        throw new Error('Host quantity cannot exceed the total quantity goal');
+    }
+
     const newPool = {
         id: generatePoolId(),
         itemName,
