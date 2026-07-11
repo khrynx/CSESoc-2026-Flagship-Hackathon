@@ -208,7 +208,7 @@
 
 .map-reload-btn:hover {
   background: #f0f4ff;
-  transform: rotate(15deg);
+  transform: rotate(-15deg);
 }
 
 /* ── Popups ──────────────────────────────────────────────── */
