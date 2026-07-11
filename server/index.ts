@@ -2,12 +2,14 @@ import cors from 'cors'
 import express from 'express'
 import { loginUser, registerUser } from './auth.js'
 import { getData } from './dataStore.js'
+import poolRoutes from './route.js'
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
+app.use('/api', poolRoutes)
 
 function ensureDemoUser() {
   const data = getData()

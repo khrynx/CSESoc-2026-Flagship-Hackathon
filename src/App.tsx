@@ -87,9 +87,34 @@ function App() {
   const [loginData, setLoginData] = useState({ email: '', password: '' })
   const [signupData, setSignupData] = useState({ username: '', email: '', password: '', phoneNumber: '' })
   const [authMessage, setAuthMessage] = useState('')
+  const [currentUser, setCurrentUser] = useState<{ userId: string; username: string; email: string } | null>(null)
+  const [poolForm, setPoolForm] = useState({
+    itemName: '',
+    desc: '',
+    price: '',
+    quantityGoal: '',
+    deadline: '',
+    longitude: '',
+    latitude: '',
+    hostquantity: '',
+  })
+  const [poolMessage, setPoolMessage] = useState('')
+  const [pools, setPools] = useState<Array<{
+    id: string
+    itemName: string
+    desc: string
+    price: number
+    quantityGoal: number
+    currentTotal: number
+    deadline: string
+    longitude: number
+    latitude: number
+    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
+  }>>([])
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
+  const selectedLocationMarkerRef = useRef<maplibregl.Marker | null>(null)
 
   const selectedBuy = useMemo(
     () => groupBuys.find((item) => item.id === selectedId) ?? groupBuys[0],
@@ -107,6 +132,23 @@ function App() {
       },
       () => undefined,
     )
+  }, [])
+
+  useEffect(() => {
+    const loadPools = async () => {
+      try {
+        const response = await fetch('/api/pools')
+        const data = await parseApiResponse(response)
+
+        if (response.ok) {
+          setPools(data.pools ?? [])
+        }
+      } catch {
+        setPools([])
+      }
+    }
+
+    loadPools()
   }, [])
 
   useEffect(() => {
@@ -133,44 +175,65 @@ function App() {
         requestAnimationFrame(() => mapInstanceRef.current?.resize())
         setMapReady(true)
       })
+
+      mapInstanceRef.current.on('click', (event) => {
+        const { lng, lat } = event.lngLat
+        setPoolForm((current) => ({
+          ...current,
+          longitude: lng.toFixed(6),
+          latitude: lat.toFixed(6),
+        }))
+
+        if (selectedLocationMarkerRef.current) {
+          selectedLocationMarkerRef.current.remove()
+        }
+
+        selectedLocationMarkerRef.current = new maplibregl.Marker({ color: '#ef4444' })
+          .setLngLat([lng, lat])
+          .addTo(mapInstanceRef.current!)
+      })
     }
 
     const map = mapInstanceRef.current
 
     markersRef.current.forEach((marker) => marker.remove())
-    markersRef.current = groupBuys.map((buy) => {
-      const marker = new maplibregl.Marker({ color: buy.accent })
-        .setLngLat([buy.position.lng, buy.position.lat])
+    markersRef.current = pools.map((pool) => {
+      const marker = new maplibregl.Marker({ color: '#14b8a6' })
+        .setLngLat([pool.longitude, pool.latitude])
         .setPopup(
-          new maplibregl.Popup({ offset: 20 }).setHTML(`<strong>${buy.title}</strong><br />${buy.item}`),
+          new maplibregl.Popup({ offset: 20 }).setHTML(`<strong>${pool.itemName}</strong><br />${pool.desc}`),
         )
         .addTo(map)
 
-      marker.getElement().addEventListener('click', () => setSelectedId(buy.id))
+      marker.getElement().addEventListener('click', () => setSelectedId(Number(pool.id)))
       return marker
     })
-  }, [userLocation])
+  }, [userLocation, pools])
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
       return
     }
 
-    mapInstanceRef.current.flyTo({
-      center: [selectedBuy.position.lng, selectedBuy.position.lat],
-      zoom: 13,
-      essential: true,
-    })
+    const selectedPool = pools.find((pool) => Number(pool.id) === selectedId)
+
+    if (selectedPool) {
+      mapInstanceRef.current.flyTo({
+        center: [selectedPool.longitude, selectedPool.latitude],
+        zoom: 13,
+        essential: true,
+      })
+    }
 
     markersRef.current.forEach((marker, index) => {
-      const buy = groupBuys[index]
+      const pool = pools[index]
       const element = marker.getElement()
-      element.style.width = buy.id === selectedBuy.id ? '18px' : '14px'
-      element.style.height = buy.id === selectedBuy.id ? '18px' : '14px'
-      element.style.border = buy.id === selectedBuy.id ? '3px solid #10213a' : '2px solid white'
+      element.style.width = pool && Number(pool.id) === selectedId ? '18px' : '14px'
+      element.style.height = pool && Number(pool.id) === selectedId ? '18px' : '14px'
+      element.style.border = pool && Number(pool.id) === selectedId ? '3px solid #10213a' : '2px solid white'
       element.style.transform = 'translate(-50%, -50%)'
     })
-  }, [selectedBuy])
+  }, [selectedId, pools])
 
   const parseApiResponse = async (response: Response) => {
     const text = await response.text()
@@ -194,6 +257,82 @@ function App() {
   const handleSignupChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
     setSignupData((current) => ({ ...current, [name]: value }))
+  }
+
+  const handlePoolFormChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target
+    setPoolForm((current) => ({ ...current, [name]: value }))
+  }
+
+  const handlePoolSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!currentUser?.userId) {
+      setPoolMessage('Please sign in before creating a pool.')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/pools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser?.userId,
+          itemName: poolForm.itemName,
+          desc: poolForm.desc,
+          price: Number(poolForm.price),
+          quantityGoal: Number(poolForm.quantityGoal),
+          deadline: poolForm.deadline,
+          longitude: Number(poolForm.longitude),
+          latitude: Number(poolForm.latitude),
+          hostquantity: Number(poolForm.hostquantity),
+        }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to create pool.')
+      }
+
+      setPoolMessage('Pool created successfully.')
+      const createdPool = data.pool
+      if (createdPool) {
+        setPools((current) => [...current, createdPool])
+      }
+      setPoolForm({
+        itemName: '',
+        desc: '',
+        price: '',
+        quantityGoal: '',
+        deadline: '',
+        longitude: '',
+        latitude: '',
+        hostquantity: '',
+      })
+    } catch (error) {
+      setPoolMessage(error instanceof Error ? error.message : 'Unable to create pool.')
+    }
+  }
+
+  const handleJoinPool = async (poolId: string) => {
+    try {
+      const response = await fetch(`/api/pools/${poolId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser?.userId, quantity: 1 }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to join pool.')
+      }
+
+      setPoolMessage('Joined pool successfully.')
+    } catch (error) {
+      setPoolMessage(error instanceof Error ? error.message : 'Unable to join pool.')
+    }
   }
 
   const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -220,6 +359,7 @@ function App() {
         throw new Error(data.message || 'Unable to sign in right now.')
       }
 
+      setCurrentUser(data.user ?? null)
       setAuthMessage(`Welcome back, ${data.user?.username || loginData.email}!`)
       setView('app')
     } catch (error) {
@@ -352,7 +492,7 @@ function App() {
           <button type="button" className="ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
             Log out
           </button>
-          <button type="button" className="ghost-btn">
+          <button type="button" className="ghost-btn" onClick={() => setPoolMessage('') }>
             Create group buy
           </button>
         </div>
@@ -377,6 +517,82 @@ function App() {
           <div>
             <strong>6.4kg</strong>
             <span>packaging avoided</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="dashboard">
+        <div className="map-card">
+          <div className="map-header">
+            <div>
+              <p className="eyebrow">Create a shared buy</p>
+              <h3>Start a new pool</h3>
+            </div>
+          </div>
+
+          <form className="auth-form" onSubmit={handlePoolSubmit}>
+            <label className="input-group">
+              <span>Item name</span>
+              <input name="itemName" value={poolForm.itemName} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Description</span>
+              <textarea name="desc" value={poolForm.desc} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Price</span>
+              <input name="price" type="number" value={poolForm.price} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Quantity goal</span>
+              <input name="quantityGoal" type="number" value={poolForm.quantityGoal} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Deadline</span>
+              <input name="deadline" type="datetime-local" value={poolForm.deadline} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Longitude</span>
+              <input name="longitude" type="number" value={poolForm.longitude} onChange={handlePoolFormChange} />
+            </label>
+            <label className="input-group">
+              <span>Latitude</span>
+              <input name="latitude" type="number" value={poolForm.latitude} onChange={handlePoolFormChange} />
+            </label>
+            <p className="auth-link">Click the map to choose the pickup location.</p>
+            <label className="input-group">
+              <span>Your quantity</span>
+              <input name="hostquantity" type="number" value={poolForm.hostquantity} onChange={handlePoolFormChange} />
+            </label>
+            <button type="submit" className="primary-btn">Create pool</button>
+            {poolMessage ? <p className="form-message success">{poolMessage}</p> : null}
+          </form>
+        </div>
+
+        <div className="map-card">
+          <div className="map-header">
+            <div>
+              <p className="eyebrow">Join a shared buy</p>
+              <h3>Available pools</h3>
+            </div>
+          </div>
+
+          <div className="detail-list">
+            {pools.length === 0 ? (
+              <p className="auth-link">No pools yet. Create one to get started.</p>
+            ) : (
+              pools.map((pool) => (
+                <div key={pool.id} className="detail-list-item">
+                  <div>
+                    <strong>{pool.itemName}</strong>
+                    <p>{pool.desc}</p>
+                  </div>
+                  <button type="button" className="primary-btn" onClick={() => handleJoinPool(pool.id)}>
+                    Join
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
