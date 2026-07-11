@@ -108,4 +108,10 @@ export function initMockData() {
     joinPool(user13.userId, pool6.id, 1);
 
     joinPool(user14.userId, pool7.id, 3);
+
+    // Special mock data for demonstration purposes
+    const specialPool = makePool(user2.userId, 'Special Pool (wow)', 'This is a special pool for demonstration purposes. Fulfill me!!', 5, 20, new Date('2026-07-12'), -33.9000, 151.2000, 5, 'Other');
+    joinPool(user1.userId, specialPool.id, 10);
+    joinPool(user3.userId, specialPool.id, 5);
+    joinPool(user4.userId, specialPool.id, 2);
 }
