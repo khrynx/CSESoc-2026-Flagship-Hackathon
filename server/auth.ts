@@ -42,6 +42,8 @@ export function getUserById(userId:string) {
     return getData().users.find(user => user.userId === userId);
 }
 
+export const regsiterUser = registerUser;
+
 export function loginUser(email:string, inputPassword:string) {
     const data = getData();
     const user = data.users.find(user => user.email === email.toLowerCase());

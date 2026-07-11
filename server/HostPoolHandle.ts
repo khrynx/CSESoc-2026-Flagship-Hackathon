@@ -16,3 +16,28 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
     globalPools.push(newPool);
 }
 
+export function getHostingPools(userId: string) {
+    const { globalPools } = getData();
+    return globalPools.filter((pool) => pool.participants[0].userId === userId);
+}
+
+export function cancelPool(userId: string, poolId: string) {
+    const { users, globalPools } = getData();
+    const poolIndex = globalPools.findIndex((p) => p.id === poolId);
+    const user = users.find((u) => u.userId === userId);
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (poolIndex === -1) {
+        throw new Error('Pool not found');
+    }
+
+    const pool = globalPools[poolIndex];
+    if (pool.participants[0].userId !== userId) {
+        throw new Error('Only the host can cancel the pool');
+    }
+
+    globalPools.splice(poolIndex, 1);
+}
