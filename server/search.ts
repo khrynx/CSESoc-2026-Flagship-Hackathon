@@ -1,4 +1,4 @@
-import { getData } from './dataStore.js'
+import { getData, Pool } from './dataStore.js'
 
 export function searchPools(query: string) {
   const normalizedQuery = query.trim().toLowerCase()
@@ -14,10 +14,16 @@ export function searchPools(query: string) {
   })
 }
 
-export function filterPoolsDistance(distance: number, userLongitude: number, userLatitude: number) {
+export function filterAllPools(distance: number, userLongitude: number, userLatitude: number, price: number, size: number) {
   const { globalPools } = getData();
+  let filteredPools = globalPools;
+  filteredPools = filterPoolsDistance(distance, userLongitude, userLatitude, filteredPools);
+  filteredPools = filterPoolsPrice(price, filteredPools);
+  filteredPools = filterPoolsSize(size, filteredPools);
+}
 
-  return globalPools.filter((pool) => {
+function filterPoolsDistance(distance: number, userLongitude: number, userLatitude: number, pools: Pool[]) {
+  return pools.filter((pool) => {
     const distanceToPool = calculateDistance(userLatitude, userLongitude, pool.latitude, pool.longitude);
     return distanceToPool <= distance;
   })
@@ -29,11 +35,10 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     return Math.sqrt(latdist * latdist + londist * londist);
 }
 
-export function filterPoolsPrice(distance: number, userLongitude: number, userLatitude: number) {
-  const { globalPools } = getData();
+function filterPoolsPrice(price: number, pools: Pool[]) {
+  return pools.filter((pool) => pool.price <= price);
+}
 
-  return globalPools.filter((pool) => {
-    const distanceToPool = calculateDistance(userLatitude, userLongitude, pool.latitude, pool.longitude);
-    return distanceToPool <= distance;
-  })
+function filterPoolsSize(size: number, pools: Pool[]) {
+  return pools.filter((pool) => pool.quantityGoal <= size);
 }
