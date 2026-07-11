@@ -25,14 +25,15 @@ export function registerUser(username:string, email:string, password:string, pho
     const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password before storing
 
     const userId = generateUserId();
-    const pools: Pool[] = [];
+    const emptyPool: Pool[] = [];
     const user: User = {
         userId,
         username,
         email: email.toLowerCase(),
         password: hashedPassword,
         phoneNumber,
-        pools
+        participatingPools: emptyPool,
+        hostingPools: emptyPool,
     };
 
     data.users.push(user);

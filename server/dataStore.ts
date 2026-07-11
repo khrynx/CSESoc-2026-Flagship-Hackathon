@@ -33,8 +33,8 @@ export interface User {
     email: string;
     password: string;
     phoneNumber: string;
-    pools: Pool[];
-
+    hostingPools: Pool[];
+    participatingPools: Pool[];
 }
 
 export interface Data {
