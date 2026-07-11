@@ -1,4 +1,4 @@
-import {getData, Review} from './dataStore.js';
+import {getData, persistData, Review} from './dataStore.js';
 
 // Add a review for a user
 export function addReview(reviewerId: string, revieweeId: string, rating: number, comment: string, isHost: boolean) {
@@ -28,6 +28,7 @@ export function addReview(reviewerId: string, revieweeId: string, rating: number
         reviewee.participantReviews.push(review);
     }
     updateAverageRatings(revieweeId);
+    persistData();
 }
 
 // Delete a review by its ID and the reviewee's ID
@@ -43,6 +44,7 @@ export function deleteReview(reviewId: string, revieweeId: string) {
     if (reviewIndexHost !== -1) {
         reviewee.hostReviews.splice(reviewIndexHost, 1);
         updateAverageRatings(revieweeId);
+        persistData();
         return;
     }
 
@@ -50,6 +52,7 @@ export function deleteReview(reviewId: string, revieweeId: string) {
     if (reviewIndexParticipant !== -1) {
         reviewee.participantReviews.splice(reviewIndexParticipant, 1);
         updateAverageRatings(revieweeId);
+        persistData();
         return;
     }  
 
@@ -92,6 +95,7 @@ export function editReview(reviewId: string, revieweeId: string, newRating?: num
     editReviewInArray(reviewee.hostReviews, reviewId, newRating, newComment);
     editReviewInArray(reviewee.participantReviews, reviewId, newRating, newComment);
     updateAverageRatings(revieweeId);
+    persistData();
 }
 
 // Helper function to edit a review in an array of reviews

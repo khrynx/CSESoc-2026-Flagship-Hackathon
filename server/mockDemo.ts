@@ -4,6 +4,8 @@ import { makePool } from './HostPoolHandle.js';
 import { joinPool } from './ParticipantPoolHandle.js';
 
 export function initMockData() {
+    const daysFromNow = (days: number) => new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+
     // Create mock users
     const user1 = registerUser('Antony C', 'antony@gmail.com', 'Password123!', '0400000000');
     const user2 = registerUser('Kevin Li', 'kevin@gmail.com', 'Password123!', '0400000001');
@@ -25,13 +27,13 @@ export function initMockData() {
 
     // Create mock pools
     // makePool(userId: string, itemName: string, desc: string, price: number, quantityGoal: number, deadline: Date, longitude: number, latitude: number, hostquantity: number, category: Category)
-    const pool1 = makePool(user1.userId, 'Whey Protein', 'A huge truck load of PROTEIN!!!!', 5, 50, new Date('2026-01-02'), -33.9443, 151.0574, 5, 'Health & Wellness');
-    const pool2 = makePool(user1.userId, 'Paper Towels', 'Many rolls of paper towels', 2, 60, new Date('2026-05-02'), -33.8849, 151.2263, 5, 'Health & Wellness');
-    const pool3 = makePool(user2.userId, 'Canned Beans', 'A lot of canned beans', 1, 100, new Date('2026-03-15'), -33.8908, 151.2743, 10, 'Pantry & Dry Goods');
-    const pool4 = makePool(user3.userId, 'Dog Food', 'Yummy delicious doggy treats!', 3, 80, new Date('2026-04-10'), -33.8708, 151.2069, 5, 'Pet Supplies');
-    const pool5 = makePool(user4.userId, 'Canned Tuna', 'A lot of canned tuna', 2, 70, new Date('2026-02-20'), -33.8908, 151.2743, 10, 'Pantry & Dry Goods');
-    const pool6 = makePool(user5.userId, 'Soccer Balls', 'HAALAND HAALAND', 4, 10, new Date('2026-06-05'), -33.8849, 151.2263, 15, 'Sports & Outdoors');
-    const pool7 = makePool(user6.userId, 'Hot Wheels', 'Good ol\' Hot Wheels', 3, 40, new Date('2026-07-15'), -33.9443, 151.0574, 20, 'Toys & Games');
+    const pool1 = makePool(user1.userId, 'Whey Protein', 'A huge truck load of PROTEIN!!!!', 5, 50, daysFromNow(14), 151.0574, -33.9443, 5, 'Health & Wellness');
+    const pool2 = makePool(user1.userId, 'Paper Towels', 'Many rolls of paper towels', 2, 60, daysFromNow(18), 151.2263, -33.8849, 5, 'Health & Wellness');
+    const pool3 = makePool(user2.userId, 'Canned Beans', 'A lot of canned beans', 1, 100, daysFromNow(20), 151.2743, -33.8908, 10, 'Pantry & Dry Goods');
+    const pool4 = makePool(user3.userId, 'Dog Food', 'Yummy delicious doggy treats!', 3, 80, daysFromNow(24), 151.2069, -33.8708, 5, 'Pet Supplies');
+    const pool5 = makePool(user4.userId, 'Canned Tuna', 'A lot of canned tuna', 2, 70, daysFromNow(16), 151.2743, -33.8908, 10, 'Pantry & Dry Goods');
+    const pool6 = makePool(user5.userId, 'Soccer Balls', 'HAALAND HAALAND', 4, 10, daysFromNow(22), 151.2263, -33.8849, 5, 'Sports & Outdoors');
+    const pool7 = makePool(user6.userId, 'Hot Wheels', 'Good ol\' Hot Wheels', 3, 40, daysFromNow(28), 151.0574, -33.9443, 20, 'Toys & Games');
 
     // Create host mock reviews
     // addReview(userId: string, revieweeId: string, rating: number, comment: string)
@@ -85,8 +87,8 @@ export function initMockData() {
 
     joinPool(user3.userId, pool2.id, 2);
     joinPool(user4.userId, pool2.id, 4);
-    joinPool(user4.userId, pool2.id, 5);
-    joinPool(user4.userId, pool2.id, 2);
+    joinPool(user5.userId, pool2.id, 5);
+    joinPool(user6.userId, pool2.id, 2);
 
     joinPool(user5.userId, pool3.id, 10);
     joinPool(user6.userId, pool3.id, 12);
@@ -110,7 +112,7 @@ export function initMockData() {
     joinPool(user14.userId, pool7.id, 3);
 
     // Special mock data for demonstration purposes
-    const specialPool = makePool(user2.userId, 'Special Pool (wow)', 'This is a special pool for demonstration purposes. Fulfill me!!', 5, 20, new Date('2026-07-12'), -33.9000, 151.2000, 5, 'Other');
+    const specialPool = makePool(user2.userId, 'Special Pool (wow)', 'This is a special pool for demonstration purposes. Fulfill me!!', 5, 20, daysFromNow(10), 151.2000, -33.9000, 5, 'Other');
     joinPool(user1.userId, specialPool.id, 10);
     joinPool(user3.userId, specialPool.id, 5);
     joinPool(user4.userId, specialPool.id, 2);

@@ -160,3 +160,51 @@ export function acceptRequest(userId: string, requestId: string) {
         removed: wasRemoved,
     };
 }
+
+export function cancelOutgoingRequest(userId: string, requestId: string) {
+    const { users } = getData();
+    const participant = users.find((u) => u.userId === userId);
+    if (!participant) {
+        throw new Error('User not found');
+    }
+
+    const outgoingRequest = participant.requests.find((r) => r.requestId === requestId && r.direction === 'outgoing');
+    if (!outgoingRequest) {
+        throw new Error('Outgoing request not found');
+    }
+
+    if (outgoingRequest.status === 'rejected') {
+        throw new Error('Rejected requests can only be closed');
+    }
+
+    participant.requests = participant.requests.filter((r) => !(r.requestId === requestId && r.direction === 'outgoing'));
+
+    if (outgoingRequest.status === 'pending') {
+        const host = users.find((u) => u.userId === outgoingRequest.toUserId);
+        if (host) {
+            host.requests = host.requests.filter((r) => !(r.requestId === requestId && r.direction === 'incoming'));
+        }
+    }
+
+    persistData();
+}
+
+export function closeRejectedOutgoingRequest(userId: string, requestId: string) {
+    const { users } = getData();
+    const participant = users.find((u) => u.userId === userId);
+    if (!participant) {
+        throw new Error('User not found');
+    }
+
+    const outgoingRequest = participant.requests.find((r) => r.requestId === requestId && r.direction === 'outgoing');
+    if (!outgoingRequest) {
+        throw new Error('Outgoing request not found');
+    }
+
+    if (outgoingRequest.status !== 'rejected') {
+        throw new Error('Only rejected requests can be closed');
+    }
+
+    participant.requests = participant.requests.filter((r) => !(r.requestId === requestId && r.direction === 'outgoing'));
+    persistData();
+}

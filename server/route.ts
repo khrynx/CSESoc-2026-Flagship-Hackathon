@@ -3,7 +3,9 @@ import { getUserById } from './auth.js'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { cleanupInactivePools, getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
-import { acceptRequest, declineRequest } from './permissions.js'
+import { initMockData } from './mockDemo.js'
+import { acceptRequest, cancelOutgoingRequest, closeRejectedOutgoingRequest, declineRequest } from './permissions.js'
+import { addReview, getHostReviews, getParticipantReviews } from './reviews.js'
 import { filterAllPools, searchPools } from './search.js'
 
 const router = express.Router()
@@ -28,6 +30,20 @@ router.post('/reset', (_req, res) => {
     res.json({ message: 'Data reset successfully.', pools: data.globalPools })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to reset data.' })
+  }
+})
+
+router.post('/mockdemo', (_req, res) => {
+  try {
+    resetData()
+    initMockData()
+    const { globalPools } = getData()
+    res.json({
+      message: 'Mock demo data loaded successfully.',
+      pools: globalPools,
+    })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load mock demo data.' })
   }
 })
 
@@ -150,15 +166,52 @@ router.get('/users/:userId/requests', (req, res) => {
     const { users } = getData()
     const requests = (user?.requests ?? []).map((request) => {
       const sender = users.find((candidate) => candidate.userId === request.fromUserId)
+      const receiver = users.find((candidate) => candidate.userId === request.toUserId)
       return {
         ...request,
         fromUsername: sender?.username ?? request.fromUserId,
+        toUsername: receiver?.username ?? request.toUserId,
       }
     })
 
     res.json({ requests })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user requests.' })
+  }
+})
+
+router.get('/users/:userId/profile', (req, res) => {
+  try {
+    const user = getUserById(req.params.userId)
+    if (!user) {
+      res.status(404).json({ message: 'User not found.' })
+      return
+    }
+
+    const hostReviews = getHostReviews(user.userId)
+    const participantReviews = getParticipantReviews(user.userId)
+    const { globalPools } = getData()
+    const hostingPools = globalPools.filter((pool) => pool.hostUserId === user.userId)
+
+    const hostRating = hostReviews.length === 0
+      ? 0
+      : hostReviews.reduce((sum, review) => sum + review.rating, 0) / hostReviews.length
+
+    const participantRating = participantReviews.length === 0
+      ? 0
+      : participantReviews.reduce((sum, review) => sum + review.rating, 0) / participantReviews.length
+
+    res.json({
+      profile: {
+        userId: user.userId,
+        username: user.username,
+        hostRating,
+        participantRating,
+        hostingPools,
+      },
+    })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load profile.' })
   }
 })
 
@@ -191,6 +244,60 @@ router.post('/requests/:requestId/decline', (req, res) => {
     res.json({ message: 'Request declined.' })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to decline request.' })
+  }
+})
+
+router.post('/requests/:requestId/outgoing/cancel', (req, res) => {
+  try {
+    const { userId } = req.body ?? {}
+
+    if (!userId) {
+      res.status(400).json({ message: 'User id is required.' })
+      return
+    }
+
+    cancelOutgoingRequest(userId, req.params.requestId)
+    res.json({ message: 'Request cancelled.' })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to cancel request.' })
+  }
+})
+
+router.post('/requests/:requestId/outgoing/close', (req, res) => {
+  try {
+    const { userId } = req.body ?? {}
+
+    if (!userId) {
+      res.status(400).json({ message: 'User id is required.' })
+      return
+    }
+
+    closeRejectedOutgoingRequest(userId, req.params.requestId)
+    res.json({ message: 'Request closed.' })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to close request.' })
+  }
+})
+
+router.post('/reviews', (req, res) => {
+  try {
+    const { reviewerId, revieweeId, rating, comment, isHost } = req.body ?? {}
+
+    if (!reviewerId || !revieweeId || rating === undefined || typeof isHost !== 'boolean') {
+      res.status(400).json({ message: 'Reviewer, reviewee, rating and role are required.' })
+      return
+    }
+
+    const parsedRating = Number(rating)
+    if (!Number.isFinite(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      res.status(400).json({ message: 'Rating must be between 1 and 5.' })
+      return
+    }
+
+    addReview(String(reviewerId), String(revieweeId), parsedRating, String(comment ?? ''), Boolean(isHost))
+    res.status(201).json({ message: 'Review submitted.' })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to submit review.' })
   }
 })
 

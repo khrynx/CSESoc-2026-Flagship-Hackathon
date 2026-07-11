@@ -83,6 +83,11 @@ export function cancelPool(userId: string, poolId: string) {
         throw new Error('Only the host can cancel the pool');
     }
 
+    if (pool.participants.length > 1) {
+        throw new Error('Host can only cancel when no other participants are in the pool');
+    }
+
     globalPools.splice(globalPoolIndex, 1);
     user.hostingPools.splice(hostingPoolIndex, 1);
+    persistData();
 }

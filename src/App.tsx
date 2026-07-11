@@ -47,7 +47,22 @@ type UserRequest = {
   fromUserId: string
   fromUsername?: string
   toUserId: string
+  toUsername?: string
   status: 'pending' | 'accepted' | 'rejected'
+}
+
+type UserProfile = {
+  userId: string
+  username: string
+  hostRating: number
+  participantRating: number
+  hostingPools: Pool[]
+}
+
+type CloseRatingTarget = {
+  userId: string
+  username: string
+  isHostReview: boolean
 }
 
 const poolCategories = [
@@ -179,7 +194,14 @@ function App() {
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
   const [pools, setPools] = useState<Pool[]>([])
   const [userRequests, setUserRequests] = useState<UserRequest[]>([])
+  const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({})
+  const [selectedProfileUserId, setSelectedProfileUserId] = useState<string | null>(null)
   const [homeRequestMessage, setHomeRequestMessage] = useState('')
+  const [requestTab, setRequestTab] = useState<'incoming' | 'outgoing'>('incoming')
+  const [dismissedFulfilledPoolIds, setDismissedFulfilledPoolIds] = useState<string[]>([])
+  const [poolToClose, setPoolToClose] = useState<Pool | null>(null)
+  const [closeRatings, setCloseRatings] = useState<Record<string, string>>({})
+  const [closePoolMessage, setClosePoolMessage] = useState('')
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -191,12 +213,45 @@ function App() {
     [pools, selectedPoolId],
   )
 
+  const selectedProfile = useMemo(
+    () => (selectedProfileUserId ? userProfiles[selectedProfileUserId] ?? null : null),
+    [selectedProfileUserId, userProfiles],
+  )
+
+  const isPoolFulfilled = (pool: Pool): boolean => pool.currentTotal >= pool.quantityGoal
+
+  const closeRatingTargets = useMemo<CloseRatingTarget[]>(() => {
+    if (!poolToClose || !currentUser?.userId) {
+      return []
+    }
+
+    const hostUserId = poolToClose.hostUserId ?? poolToClose.participants[0]?.userId
+    const hostedByCurrentUser = Boolean(hostUserId && hostUserId === currentUser.userId)
+
+    if (hostedByCurrentUser) {
+      return poolToClose.participants
+        .filter((participant) => participant.userId !== currentUser.userId)
+        .map((participant) => ({ userId: participant.userId, username: participant.username, isHostReview: false }))
+    }
+
+    const hostParticipant = poolToClose.participants.find((participant) => participant.userId === hostUserId)
+    if (!hostUserId || !hostParticipant) {
+      return []
+    }
+
+    return [{ userId: hostUserId, username: hostParticipant.username, isHostReview: true }]
+  }, [poolToClose, currentUser?.userId])
+
   const myParticipantPools = useMemo(() => {
     if (!currentUser?.userId) {
       return []
     }
-    return pools.filter((pool) => pool.participants.some((participant) => participant.userId === currentUser.userId))
-  }, [currentUser?.userId, pools])
+    return pools.filter(
+      (pool) =>
+        !dismissedFulfilledPoolIds.includes(pool.id) &&
+        pool.participants.some((participant) => participant.userId === currentUser.userId),
+    )
+  }, [currentUser?.userId, pools, dismissedFulfilledPoolIds])
 
   const incomingHostRequests = useMemo(() => {
     if (!currentUser?.userId) {
@@ -207,12 +262,22 @@ function App() {
     )
   }, [currentUser?.userId, userRequests])
 
+  const outgoingRequests = useMemo(
+    () => userRequests.filter((request) => request.direction === 'outgoing'),
+    [userRequests],
+  )
+
   const pendingRequestCount = userRequests.filter((request) => request.direction === 'incoming' && request.status === 'pending').length
 
   const getPoolMarkerColor = (pool: Pool): string => {
     const fullness = Math.max(0, Math.min(1, pool.currentTotal / pool.quantityGoal))
     const hue = 120 - fullness * 120
     return `hsl(${hue}, 85%, 45%)`
+  }
+
+  const renderStars = (rating: number): string => {
+    const rounded = Math.round(Math.max(0, Math.min(5, rating)))
+    return `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`
   }
 
   const isHostedByCurrentUser = (pool: Pool): boolean => {
@@ -285,7 +350,7 @@ function App() {
           return
         }
 
-        const latestPools = poolsData.pools ?? []
+        const latestPools: Pool[] = poolsData.pools ?? []
         if (cancelled) {
           return
         }
@@ -293,7 +358,7 @@ function App() {
         setPools(latestPools)
 
         if (!activeSearchQuery && !distanceFilter && !hasMapAdvancedFilters) {
-          setDisplayedPools(latestPools)
+          setDisplayedPools(latestPools.filter((pool) => !isPoolFulfilled(pool)))
         }
 
         if (!homeSearchQuery.trim() && !homeDistanceFilter && !hasHomeAdvancedFilters) {
@@ -356,7 +421,7 @@ function App() {
         const data = await parseApiResponse(response)
 
         if (!cancelled && response.ok) {
-          setDisplayedPools(data.pools ?? [])
+          setDisplayedPools((data.pools ?? []).filter((pool: Pool) => !isPoolFulfilled(pool)))
         }
       } catch {
         if (!cancelled) {
@@ -417,6 +482,36 @@ function App() {
       window.clearInterval(pollId)
     }
   }, [currentUser?.userId])
+
+  useEffect(() => {
+    if (!selectedPool) {
+      return
+    }
+
+    const participantIds = Array.from(new Set(selectedPool.participants.map((participant) => participant.userId)))
+
+    const loadProfiles = async () => {
+      const loadedProfiles: Record<string, UserProfile> = {}
+
+      await Promise.all(participantIds.map(async (userId) => {
+        try {
+          const response = await fetch(`/api/users/${userId}/profile`)
+          const data = await parseApiResponse(response)
+          if (response.ok && data.profile) {
+            loadedProfiles[userId] = data.profile as UserProfile
+          }
+        } catch {
+          // Ignore profile lookup failures for individual users.
+        }
+      }))
+
+      if (Object.keys(loadedProfiles).length > 0) {
+        setUserProfiles((current) => ({ ...current, ...loadedProfiles }))
+      }
+    }
+
+    void loadProfiles()
+  }, [selectedPool])
 
   const retryMap = (source: 'manual' | 'auto' = 'manual') => {
     if (source === 'auto' && hasAutoRetriedRef.current) {
@@ -538,7 +633,7 @@ function App() {
   useEffect(() => {
     const run = async () => {
       if (!activeSearchQuery && !distanceFilter && !hasMapAdvancedFilters) {
-        setDisplayedPools(pools)
+        setDisplayedPools(pools.filter((pool) => !isPoolFulfilled(pool)))
         return
       }
       try {
@@ -561,11 +656,11 @@ function App() {
         const response = await fetch(`/api/search?${params}`)
         const data = await parseApiResponse(response)
         if (response.ok) {
-          setDisplayedPools(data.pools ?? [])
+          setDisplayedPools((data.pools ?? []).filter((pool: Pool) => !isPoolFulfilled(pool)))
           setShowSearchResults(true)
         }
       } catch {
-        setDisplayedPools(pools)
+        setDisplayedPools(pools.filter((pool) => !isPoolFulfilled(pool)))
       }
     }
     run()
@@ -824,6 +919,73 @@ function App() {
     }
   }
 
+  const handleCancelOutgoingRequest = async (requestId: string) => {
+    if (!currentUser?.userId) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/requests/${requestId}/outgoing/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.userId }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to cancel request.')
+      }
+
+      setUserRequests((current) => current.filter((request) => !(request.requestId === requestId && request.direction === 'outgoing')))
+      setHomeRequestMessage('Outgoing request cancelled.')
+    } catch (error) {
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to cancel request.')
+    }
+  }
+
+  const handleCloseRejectedOutgoingRequest = async (requestId: string) => {
+    if (!currentUser?.userId) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/requests/${requestId}/outgoing/close`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.userId }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to close request.')
+      }
+
+      setUserRequests((current) => current.filter((request) => !(request.requestId === requestId && request.direction === 'outgoing')))
+      setHomeRequestMessage('Rejected request removed.')
+    } catch (error) {
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to close request.')
+    }
+  }
+
+  const handleOpenUserProfile = async (userId: string) => {
+    setSelectedProfileUserId(userId)
+    if (userProfiles[userId]) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/users/${userId}/profile`)
+      const data = await parseApiResponse(response)
+      if (response.ok && data.profile) {
+        setUserProfiles((current) => ({ ...current, [userId]: data.profile as UserProfile }))
+      }
+    } catch {
+      // Keep popup open with loading fallback.
+    }
+  }
+
   const handleAcceptRequest = async (requestId: string, poolId: string) => {
     if (!currentUser?.userId) {
       return
@@ -854,10 +1016,140 @@ function App() {
 
       const updatedPool = data.pool as Pool
       setPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
-      setDisplayedPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
+      setDisplayedPools((current) => {
+        if (updatedPool.currentTotal >= updatedPool.quantityGoal) {
+          return current.filter((pool) => pool.id !== updatedPool.id)
+        }
+        return current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool))
+      })
       setHomeRequestMessage('Request accepted.')
     } catch (error) {
       setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to accept request.')
+    }
+  }
+
+  const handleLeaveOrCancelPool = async (pool: Pool) => {
+    if (!currentUser?.userId) {
+      return
+    }
+
+    const hostedByMe = isHostedByCurrentUser(pool)
+
+    try {
+      if (!hostedByMe) {
+        const response = await fetch(`/api/pools/${pool.id}/leave`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUser.userId }),
+        })
+        const data = await parseApiResponse(response)
+        if (!response.ok) {
+          throw new Error(data.message || 'Unable to leave pool.')
+        }
+
+        setPools((current) => current.map((candidate) => {
+          if (candidate.id !== pool.id) {
+            return candidate
+          }
+          return {
+            ...candidate,
+            participants: candidate.participants.filter((participant) => participant.userId !== currentUser.userId),
+            currentTotal: Math.max(0, candidate.currentTotal - (candidate.participants.find((participant) => participant.userId === currentUser.userId)?.quantity ?? 0)),
+          }
+        }))
+        setDisplayedPools((current) => current.map((candidate) => {
+          if (candidate.id !== pool.id) {
+            return candidate
+          }
+          return {
+            ...candidate,
+            participants: candidate.participants.filter((participant) => participant.userId !== currentUser.userId),
+            currentTotal: Math.max(0, candidate.currentTotal - (candidate.participants.find((participant) => participant.userId === currentUser.userId)?.quantity ?? 0)),
+          }
+        }))
+        setHomeRequestMessage('Left pool successfully.')
+        return
+      }
+
+      const response = await fetch(`/api/pools/${pool.id}/host/${currentUser.userId}`, {
+        method: 'DELETE',
+      })
+      const data = await parseApiResponse(response)
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to cancel pool.')
+      }
+
+      setPools((current) => current.filter((candidate) => candidate.id !== pool.id))
+      setDisplayedPools((current) => current.filter((candidate) => candidate.id !== pool.id))
+      setSelectedPoolId((current) => (current === pool.id ? null : current))
+      setHomeRequestMessage('Hosted pool cancelled.')
+    } catch (error) {
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to update pool participation.')
+    }
+  }
+
+  const handleOpenClosePool = (pool: Pool) => {
+    setPoolToClose(pool)
+    const initialRatings: Record<string, string> = {}
+
+    if (currentUser?.userId) {
+      if (isHostedByCurrentUser(pool)) {
+        pool.participants
+          .filter((participant) => participant.userId !== currentUser.userId)
+          .forEach((participant) => {
+            initialRatings[participant.userId] = ''
+          })
+      } else {
+        const hostUserId = pool.hostUserId ?? pool.participants[0]?.userId
+        if (hostUserId) {
+          initialRatings[hostUserId] = ''
+        }
+      }
+    }
+
+    setCloseRatings(initialRatings)
+    setClosePoolMessage('')
+  }
+
+  const handleClosePoolSubmit = async () => {
+    if (!currentUser?.userId || !poolToClose) {
+      return
+    }
+
+    const ratingsToSubmit = Object.entries(closeRatings)
+      .map(([userId, value]) => ({ userId, rating: Number(value) }))
+      .filter(({ rating }) => Number.isFinite(rating) && rating >= 1 && rating <= 5)
+
+    try {
+      await Promise.all(ratingsToSubmit.map(async ({ userId, rating }) => {
+        const target = closeRatingTargets.find((candidate) => candidate.userId === userId)
+        if (!target) {
+          return
+        }
+
+        const response = await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reviewerId: currentUser.userId,
+            revieweeId: userId,
+            rating,
+            comment: '',
+            isHost: target.isHostReview,
+          }),
+        })
+        const data = await parseApiResponse(response)
+        if (!response.ok) {
+          throw new Error(data.message || 'Unable to submit rating.')
+        }
+      }))
+
+      setDismissedFulfilledPoolIds((current) => (current.includes(poolToClose.id) ? current : [...current, poolToClose.id]))
+      setPoolToClose(null)
+      setClosePoolMessage('')
+      setHomeRequestMessage('Pool closed.')
+    } catch (error) {
+      setClosePoolMessage(error instanceof Error ? error.message : 'Unable to submit ratings right now. Please try again.')
     }
   }
 
@@ -878,10 +1170,11 @@ function App() {
       }
 
       setPools(Array.isArray(data.pools) ? data.pools : [])
-      setDisplayedPools(Array.isArray(data.pools) ? data.pools : [])
+      setDisplayedPools(Array.isArray(data.pools) ? data.pools.filter((pool: Pool) => !isPoolFulfilled(pool)) : [])
       setSelectedPoolId(null)
       setSelectedLocation(null)
       setPoolMessage('Data reset complete.')
+      setDismissedFulfilledPoolIds([])
       if (selectedLocationMarkerRef.current) {
         selectedLocationMarkerRef.current.remove()
         selectedLocationMarkerRef.current = null
@@ -889,6 +1182,51 @@ function App() {
       retryMap('manual')
     } catch (error) {
       setPoolMessage(error instanceof Error ? error.message : 'Unable to reset data.')
+    }
+  }
+
+  const handleLoadMockDemo = async () => {
+    const confirmed = window.confirm('Load mock demo data? This will reset current users, pools, and requests.')
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/mockdemo', {
+        method: 'POST',
+      })
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to load mock demo data.')
+      }
+
+      const loadedPools = Array.isArray(data.pools) ? (data.pools as Pool[]) : []
+      setPools(loadedPools)
+      setDisplayedPools(loadedPools.filter((pool) => !isPoolFulfilled(pool)))
+      setHomeSearchResults([])
+      setShowHomeDropdown(false)
+      setUserRequests([])
+      setUserProfiles({})
+      setSelectedPoolId(null)
+      setSelectedLocation(null)
+      setDismissedFulfilledPoolIds([])
+      setPoolToClose(null)
+      setCloseRatings({})
+      setClosePoolMessage('')
+
+      if (selectedLocationMarkerRef.current) {
+        selectedLocationMarkerRef.current.remove()
+        selectedLocationMarkerRef.current = null
+      }
+
+      setCurrentUser(null)
+      setView('auth')
+      setAuthMode('login')
+      setLoginData({ email: 'antony@gmail.com', password: 'Password123!' })
+      setAuthMessage('Mock demo data loaded. Sign in with the prefilled demo account.')
+    } catch (error) {
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to load mock demo data.')
     }
   }
 
@@ -969,10 +1307,11 @@ function App() {
             <ul className="home-my-pools-list">
               {myParticipantPools.map((pool) => {
                 const hostedByMe = isHostedByCurrentUser(pool)
+                const fulfilled = isPoolFulfilled(pool)
                 return (
                   <li
                     key={pool.id}
-                    className={`home-my-pool-item${hostedByMe ? ' hosted' : ''}`}
+                    className={`home-my-pool-item${hostedByMe ? ' hosted' : ''}${fulfilled ? ' fulfilled' : ''}`}
                     onClick={() => {
                       setSelectedPoolId(pool.id)
                       setView('app')
@@ -980,10 +1319,30 @@ function App() {
                   >
                     <div className="home-my-pool-top">
                       <strong>{pool.itemName}</strong>
-                      {hostedByMe ? <span className="home-my-pool-badge">Hosting</span> : <span className="home-my-pool-badge muted">Joined</span>}
+                      {fulfilled
+                        ? <span className="home-my-pool-badge fulfilled">Fulfilled</span>
+                        : hostedByMe
+                          ? <span className="home-my-pool-badge">Hosting</span>
+                          : <span className="home-my-pool-badge muted">Joined</span>}
                     </div>
                     <span>{pool.category ?? 'Uncategorized'}</span>
-                    <span className="dropdown-meta">{pool.quantityGoal - pool.currentTotal} remaining</span>
+                    <span className="dropdown-meta">{Math.max(0, pool.quantityGoal - pool.currentTotal)} remaining</span>
+                    <button
+                      type="button"
+                      className="home-pool-action-btn"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        if (fulfilled) {
+                          handleOpenClosePool(pool)
+                          return
+                        }
+                        void handleLeaveOrCancelPool(pool)
+                      }}
+                      disabled={!fulfilled && hostedByMe && pool.participants.length > 1}
+                      title={!fulfilled && hostedByMe && pool.participants.length > 1 ? 'Host can only cancel if no one else has joined' : undefined}
+                    >
+                      {fulfilled ? 'Close pool' : hostedByMe ? 'Cancel pool' : 'Leave pool'}
+                    </button>
                   </li>
                 )
               })}
@@ -993,39 +1352,103 @@ function App() {
 
         <aside className="home-requests home-requests-rail" onClick={(e) => e.stopPropagation()}>
           <div className="home-my-pools-header">
-            <h3>Join requests</h3>
-            <span>{incomingHostRequests.length}</span>
+            <h3>Requests</h3>
+            <span>{requestTab === 'incoming' ? incomingHostRequests.length : outgoingRequests.length}</span>
           </div>
-          {incomingHostRequests.length === 0 ? (
-            <p className="home-my-pools-empty">No pending requests for your hosted pools.</p>
+          <div className="home-request-tabs">
+            <button
+              type="button"
+              className={`home-request-tab${requestTab === 'incoming' ? ' active' : ''}`}
+              onClick={() => setRequestTab('incoming')}
+            >
+              Incoming
+            </button>
+            <button
+              type="button"
+              className={`home-request-tab${requestTab === 'outgoing' ? ' active' : ''}`}
+              onClick={() => setRequestTab('outgoing')}
+            >
+              Outgoing
+            </button>
+          </div>
+
+          {requestTab === 'incoming' ? (
+            incomingHostRequests.length === 0 ? (
+              <p className="home-my-pools-empty">No incoming requests for your hosted pools.</p>
+            ) : (
+              <ul className="home-my-pools-list">
+                {incomingHostRequests.map((request) => {
+                  const requestPool = pools.find((pool) => pool.id === request.poolId)
+                  return (
+                    <li key={request.requestId} className="home-request-item">
+                      <strong>{requestPool?.itemName ?? 'Unknown pool'}</strong>
+                      <span>From: {request.fromUsername ?? request.fromUserId}</span>
+                      <span>Requested qty: {request.quantity}</span>
+                      <div className="home-request-actions">
+                        <button
+                          type="button"
+                          className="home-request-accept"
+                          onClick={() => void handleAcceptRequest(request.requestId, request.poolId)}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          type="button"
+                          className="home-request-decline"
+                          onClick={() => void handleDeclineRequest(request.requestId)}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )
           ) : (
-            <ul className="home-my-pools-list">
-              {incomingHostRequests.map((request) => {
-                const requestPool = pools.find((pool) => pool.id === request.poolId)
-                return (
-                  <li key={request.requestId} className="home-request-item">
-                    <button
-                      type="button"
-                      className="home-request-close"
-                      title="Decline request"
-                      onClick={() => void handleDeclineRequest(request.requestId)}
-                    >
-                      ✕
-                    </button>
-                    <strong>{requestPool?.itemName ?? 'Unknown pool'}</strong>
-                    <span>From: {request.fromUsername ?? request.fromUserId}</span>
-                    <span>Requested qty: {request.quantity}</span>
-                    <button
-                      type="button"
-                      className="home-request-accept"
-                      onClick={() => void handleAcceptRequest(request.requestId, request.poolId)}
-                    >
-                      Accept
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+            outgoingRequests.length === 0 ? (
+              <p className="home-my-pools-empty">No outgoing requests yet.</p>
+            ) : (
+              <ul className="home-my-pools-list">
+                {outgoingRequests.map((request) => {
+                  const requestPool = pools.find((pool) => pool.id === request.poolId)
+                  const statusClass = request.status === 'accepted' ? ' accepted' : request.status === 'rejected' ? ' rejected' : ' pending'
+                  return (
+                    <li key={request.requestId} className={`home-request-item outgoing${statusClass}`}>
+                      {request.status === 'rejected' || request.status === 'accepted' ? (
+                        <button
+                          type="button"
+                          className="home-request-close"
+                          title={request.status === 'accepted' ? 'Remove accepted request' : 'Remove rejected request'}
+                          onClick={() => {
+                            if (request.status === 'accepted') {
+                              void handleCancelOutgoingRequest(request.requestId)
+                              return
+                            }
+                            void handleCloseRejectedOutgoingRequest(request.requestId)
+                          }}
+                        >
+                          ✕
+                        </button>
+                      ) : null}
+                      <strong>{requestPool?.itemName ?? 'Unknown pool'}</strong>
+                      <span>To: {request.toUsername ?? request.toUserId}</span>
+                      <span>Requested qty: {request.quantity}</span>
+                      <span className="home-request-status">Status: {request.status}</span>
+                      {request.status === 'pending' ? (
+                        <button
+                          type="button"
+                          className="home-request-cancel"
+                          onClick={() => void handleCancelOutgoingRequest(request.requestId)}
+                        >
+                          Cancel request
+                        </button>
+                      ) : null}
+                    </li>
+                  )
+                })}
+              </ul>
+            )
           )}
           {homeRequestMessage ? <p className="home-request-message">{homeRequestMessage}</p> : null}
         </aside>
@@ -1041,6 +1464,9 @@ function App() {
                 {pendingRequestCount} pending request{pendingRequestCount === 1 ? '' : 's'}
               </span>
             ) : null}
+            <button type="button" className="home-ghost-btn" onClick={() => void handleLoadMockDemo()}>
+              Load mock demo
+            </button>
             <button type="button" className="home-ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
               Log out
             </button>
@@ -1051,7 +1477,7 @@ function App() {
         </header>
 
         <div className="home-hero">
-          <h1 className="home-title">Find a group buy<br />near you.</h1>
+          <h1 className="home-title">Find a Buy Pool<br />near you.</h1>
           <p className="home-subtitle">Split bulk purchases with neighbours. Save money, cut waste.</p>
 
           <div className="home-search-wrapper" onClick={(e) => e.stopPropagation()}>
@@ -1211,6 +1637,59 @@ function App() {
             )}
           </div>
         </div>
+
+        {poolToClose && (
+          <aside className="popup popup-profile">
+            <div className="popup-header">
+              <h3>Close pool</h3>
+              <button
+                type="button"
+                className="popup-close"
+                onClick={() => {
+                  setPoolToClose(null)
+                  setClosePoolMessage('')
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="popup-body">
+              <p className="pool-desc">{poolToClose.itemName}</p>
+              {closeRatingTargets.length === 0 ? (
+                <p className="pool-desc">No optional ratings available for this pool.</p>
+              ) : (
+                <div className="participants-section">
+                  <p className="eyebrow">Optional ratings</p>
+                  <ul className="participants-list">
+                    {closeRatingTargets.map((target) => (
+                      <li key={target.userId}>
+                        <span className="participant-main">{target.username}</span>
+                        <label className="input-group">
+                          <span>Rating (1-5, optional)</span>
+                          <select
+                            value={closeRatings[target.userId] ?? ''}
+                            onChange={(event) => setCloseRatings((current) => ({ ...current, [target.userId]: event.target.value }))}
+                          >
+                            <option value="">Skip</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                          </select>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <button type="button" className="primary-btn" onClick={() => void handleClosePoolSubmit()}>
+                Close pool
+              </button>
+              {closePoolMessage ? <p className="form-message success">{closePoolMessage}</p> : null}
+            </div>
+          </aside>
+        )}
       </main>
     )
   }
@@ -1596,7 +2075,18 @@ function App() {
             <div className="popup-body">
               <p className="pool-desc">{selectedPool.desc}</p>
               {!isHostedByCurrentUser(selectedPool) ? (
-                <p className="detail-host">Hosted by: {selectedPool.participants.find((participant) => participant.userId === selectedPool.hostUserId)?.username ?? selectedPool.participants[0]?.username ?? 'Unknown host'}</p>
+                <p className="detail-host">
+                  Hosted by:{' '}
+                  <button
+                    type="button"
+                    className="participant-name-link"
+                    onClick={() => void handleOpenUserProfile(selectedPool.hostUserId ?? selectedPool.participants[0]?.userId ?? '')}
+                    disabled={!selectedPool.hostUserId && !selectedPool.participants[0]?.userId}
+                  >
+                    {selectedPool.participants.find((participant) => participant.userId === selectedPool.hostUserId)?.username ?? selectedPool.participants[0]?.username ?? 'Unknown host'}
+                  </button>
+                  <span className="rating-inline">{renderStars(userProfiles[selectedPool.hostUserId ?? selectedPool.participants[0]?.userId ?? '']?.hostRating ?? 0)} ({(userProfiles[selectedPool.hostUserId ?? selectedPool.participants[0]?.userId ?? '']?.hostRating ?? 0).toFixed(1)})</span>
+                </p>
               ) : null}
               <div className="detail-grid">
                 <div><span>Price</span><strong>${selectedPool.price}</strong></div>
@@ -1613,9 +2103,14 @@ function App() {
                   <ul className="participants-list">
                     {selectedPool.participants.map((p) => {
                       const showPhone = isHostedByCurrentUser(selectedPool)
+                      const participantProfile = userProfiles[p.userId]
                       return (
                         <li key={p.userId}>
-                          <span className="participant-main">{p.username} — {p.quantity} units</span>
+                          <span className="participant-main">
+                            <button type="button" className="participant-name-link" onClick={() => void handleOpenUserProfile(p.userId)}>{p.username}</button>
+                            <span> — {p.quantity} units</span>
+                          </span>
+                          <span className="participant-rating">{renderStars(participantProfile?.participantRating ?? 0)} ({(participantProfile?.participantRating ?? 0).toFixed(1)})</span>
                           {showPhone ? <span className="participant-phone">{p.phoneNumber}</span> : null}
                         </li>
                       )
@@ -1638,6 +2133,48 @@ function App() {
                 </button>
               </div>
               {poolMessage && <p className="form-message success">{poolMessage}</p>}
+            </div>
+          </aside>
+        )}
+
+        {selectedProfileUserId && (
+          <aside className="popup popup-profile">
+            <div className="popup-header">
+              <h3>{selectedProfile?.username ?? 'User profile'}</h3>
+              <button
+                type="button"
+                className="popup-close"
+                onClick={() => setSelectedProfileUserId(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="popup-body">
+              {!selectedProfile ? (
+                <p className="pool-desc">Loading profile...</p>
+              ) : (
+                <>
+                  <div className="detail-grid">
+                    <div><span>Host rating</span><strong>{renderStars(selectedProfile.hostRating)} ({selectedProfile.hostRating.toFixed(1)})</strong></div>
+                    <div><span>Participant rating</span><strong>{renderStars(selectedProfile.participantRating)} ({selectedProfile.participantRating.toFixed(1)})</strong></div>
+                  </div>
+                  <div className="participants-section">
+                    <p className="eyebrow">Current listings ({selectedProfile.hostingPools.length})</p>
+                    {selectedProfile.hostingPools.length === 0 ? (
+                      <p className="pool-desc">No active hosted listings.</p>
+                    ) : (
+                      <ul className="participants-list">
+                        {selectedProfile.hostingPools.map((pool) => (
+                          <li key={pool.id}>
+                            <span className="participant-main">{pool.itemName}</span>
+                            <span className="participant-rating">{Math.max(0, pool.quantityGoal - pool.currentTotal)} remaining</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </aside>
         )}

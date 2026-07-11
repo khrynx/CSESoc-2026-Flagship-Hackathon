@@ -231,7 +231,7 @@ export function cleanupInactivePools(referenceDate: Date = new Date()) {
         store.globalPools
             .filter((pool) => {
                 const deadlineMs = new Date(pool.deadline as unknown as string | Date).getTime();
-                return pool.currentTotal >= pool.quantityGoal || deadlineMs <= cutoff;
+                return deadlineMs <= cutoff;
             })
             .map((pool) => pool.id)
     );
