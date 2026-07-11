@@ -1,4 +1,4 @@
-import { getData, Pool } from './dataStore.js'
+import { Category, getData, Pool } from './dataStore.js'
 
 export function searchPools(query: string) {
   const normalizedQuery = query.trim().toLowerCase()
@@ -14,12 +14,13 @@ export function searchPools(query: string) {
   })
 }
 
-export function filterAllPools(distance: number, userLongitude: number, userLatitude: number, price: number, size: number) {
+export function filterAllPools(distance: number, userLongitude: number, userLatitude: number, price: number, size: number, category: Category) {
   const { globalPools } = getData();
   let filteredPools = globalPools;
   filteredPools = filterPoolsDistance(distance, userLongitude, userLatitude, filteredPools);
   filteredPools = filterPoolsPrice(price, filteredPools);
   filteredPools = filterPoolsSize(size, filteredPools);
+  filteredPools = filterPoolsCategory(category, filteredPools);
 }
 
 function filterPoolsDistance(distance: number, userLongitude: number, userLatitude: number, pools: Pool[]) {
@@ -41,4 +42,8 @@ function filterPoolsPrice(price: number, pools: Pool[]) {
 
 function filterPoolsSize(size: number, pools: Pool[]) {
   return pools.filter((pool) => pool.quantityGoal <= size);
+}
+
+function filterPoolsCategory(category: Category, pools: Pool[]) {
+  return pools.filter((pool) => pool.category <= category);
 }
