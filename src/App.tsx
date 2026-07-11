@@ -85,7 +85,7 @@ function App() {
   const [mapError, setMapError] = useState(false)
   const [mapRetryCount, setMapRetryCount] = useState(0)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [view, setView] = useState<'app' | 'auth'>('auth')
+  const [view, setView] = useState<'app' | 'auth' | 'home'>('auth')
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [loginData, setLoginData] = useState({ email: '', password: '' })
   const [signupData, setSignupData] = useState({ username: '', email: '', password: '', phoneNumber: '' })
@@ -107,6 +107,21 @@ function App() {
   const [activeSearchQuery, setActiveSearchQuery] = useState('')
   const [distanceFilter, setDistanceFilter] = useState('')
   const [showSearchResults, setShowSearchResults] = useState(false)
+  const [homeSearchQuery, setHomeSearchQuery] = useState('')
+  const [homeDistanceFilter, setHomeDistanceFilter] = useState('')
+  const [homeSearchResults, setHomeSearchResults] = useState<Array<{
+    id: string
+    itemName: string
+    desc: string
+    price: number
+    quantityGoal: number
+    currentTotal: number
+    deadline: string
+    longitude: number
+    latitude: number
+    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
+  }>>([])
+  const [showHomeDropdown, setShowHomeDropdown] = useState(false)
   const [displayedPools, setDisplayedPools] = useState<Array<{
     id: string
     itemName: string
@@ -156,6 +171,19 @@ function App() {
       () => undefined,
     )
   }, [])
+
+  // Reset + reinitialise the map every time we enter the app view,
+  // because the map container is unmounted while on home/auth pages.
+  useEffect(() => {
+    if (view !== 'app') return
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove()
+      mapInstanceRef.current = null
+    }
+    setMapReady(false)
+    setMapError(false)
+    setMapRetryCount((c) => c + 1)
+  }, [view])
 
   useEffect(() => {
     const loadPools = async () => {
@@ -317,6 +345,34 @@ function App() {
     }
     run()
   }, [activeSearchQuery, distanceFilter, pools, userLocation])
+
+  useEffect(() => {
+    if (!homeSearchQuery.trim() && !homeDistanceFilter) {
+      setHomeSearchResults([])
+      setShowHomeDropdown(false)
+      return
+    }
+    const run = async () => {
+      try {
+        const params = new URLSearchParams()
+        if (homeSearchQuery.trim()) params.set('q', homeSearchQuery)
+        if (homeDistanceFilter && userLocation) {
+          params.set('distance', (Number(homeDistanceFilter) / 111).toFixed(6))
+          params.set('lng', String(userLocation.lng))
+          params.set('lat', String(userLocation.lat))
+        }
+        const response = await fetch(`/api/search?${params}`)
+        const data = await parseApiResponse(response)
+        if (response.ok) {
+          setHomeSearchResults(data.pools ?? [])
+          setShowHomeDropdown(true)
+        }
+      } catch {
+        setHomeSearchResults([])
+      }
+    }
+    run()
+  }, [homeSearchQuery, homeDistanceFilter, userLocation])
 
   useEffect(() => {
     const map = mapInstanceRef.current
@@ -492,7 +548,7 @@ function App() {
 
       setCurrentUser(data.user ?? null)
       setAuthMessage(`Welcome back, ${data.user?.username || loginData.email}!`)
-      setView('app')
+      setView('home')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to sign in right now.'
       setAuthMessage(message)
@@ -527,6 +583,102 @@ function App() {
       const message = error instanceof Error ? error.message : 'Unable to create account right now.'
       setAuthMessage(message)
     }
+  }
+
+  if (view === 'home') {
+    return (
+      <main className="home-page" onClick={() => setShowHomeDropdown(false)}>
+        <header className="home-topbar">
+          <div className="brand-row home-brand">
+            <div className="brand-badge">N</div>
+            <span className="brand-name">Neighbourly</span>
+          </div>
+          <div className="home-topbar-actions">
+            
+            <button type="button" className="home-ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
+              Log out
+            </button>
+            <button type="button" className="home-start-btn" onClick={() => setView('app')}>
+              Start a pool
+            </button>
+          </div>
+        </header>
+
+        <div className="home-hero">
+          <h1 className="home-title">Find a group buy<br />near you.</h1>
+          <p className="home-subtitle">Split bulk purchases with neighbours. Save money, cut waste.</p>
+
+          <div className="home-search-wrapper" onClick={(e) => e.stopPropagation()}>
+            <form
+              className="home-search-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (homeSearchResults.length > 0) setShowHomeDropdown(true)
+              }}
+            >
+              <input
+                type="search"
+                className="home-search-input"
+                placeholder="Search for rice, soap, pasta…"
+                value={homeSearchQuery}
+                onChange={(e) => setHomeSearchQuery(e.target.value)}
+                onFocus={() => homeSearchResults.length > 0 && setShowHomeDropdown(true)}
+                autoFocus
+              />
+              <select
+                className="home-distance-select"
+                value={homeDistanceFilter}
+                onChange={(e) => setHomeDistanceFilter(e.target.value)}
+                disabled={!userLocation}
+                title={userLocation ? 'Filter by distance' : 'Allow location access to filter by distance'}
+              >
+                <option value="">Any distance</option>
+                <option value="1">Within 1 km</option>
+                <option value="2">Within 2 km</option>
+                <option value="5">Within 5 km</option>
+                <option value="10">Within 10 km</option>
+                <option value="25">Within 25 km</option>
+              </select>
+              <button
+                type="button"
+                className="home-map-btn"
+                onClick={() => setView('app')}
+              >
+                Browse map →
+              </button>
+            </form>
+
+            {showHomeDropdown && homeSearchResults.length > 0 && (
+              <ul className="home-dropdown">
+                {homeSearchResults.map((pool) => (
+                  <li
+                    key={pool.id}
+                    className="home-dropdown-item"
+                    onClick={() => {
+                      setSelectedPoolId(pool.id)
+                      setShowHomeDropdown(false)
+                      setHomeSearchQuery('')
+                      setView('app')
+                    }}
+                  >
+                    <strong>{pool.itemName}</strong>
+                    <span>{pool.desc}</span>
+                    <span className="dropdown-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {(homeSearchQuery || homeDistanceFilter) && !showHomeDropdown && homeSearchResults.length === 0 && (
+              <div className="home-no-results">No pools found
+                {homeSearchQuery ? ` for “${homeSearchQuery}”` : ''}
+                {homeDistanceFilter ? ` within ${homeDistanceFilter} km` : ''}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    )
   }
 
   if (view === 'auth') {
@@ -647,7 +799,10 @@ function App() {
           </select>
         </form>
         <div className="topbar-actions">
-          {currentUser && <span className="pill">Hi, {currentUser.username}</span>}
+          <button type="button" className="ghost-btn" onClick={() => setView('home')}>
+            ← Home
+          </button>
+          
           <button type="button" className="ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
             Log out
           </button>
