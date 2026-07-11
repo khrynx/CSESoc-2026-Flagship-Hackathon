@@ -36,11 +36,18 @@ export interface User {
 export interface Data {
     users: User[];
     globalPools: Pool[];
+    sessions: Session[];
+}
+
+interface Session { 
+    sessionId: string;
+    userId: string;
 }
 
 const data: Data = {
     users: [],
-    globalPools: []
+    globalPools: [],
+    sessions: []
 };
 
 export function generatePoolId() {
