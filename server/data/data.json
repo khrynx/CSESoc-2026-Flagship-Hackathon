@@ -1,27 +1,27 @@
 {
   "users": [
     {
-      "userId": "rq2g13m30",
+      "userId": "57pun6cmv",
       "username": "Antony C",
       "email": "antony@gmail.com",
-      "password": "$2b$10$fGpmi7XeYaYHnq8rPbfBv.Z.vfB0u1q0uJkJJgOjSp4rXPl9dL1tW",
+      "password": "$2b$10$ok2KH6leGplpbihxj.YgJuCpy29iNlITpR9ccUfuxsUstw109Q1oe",
       "phoneNumber": "0400000000",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "ifl01f7tc",
-          "hostUserId": "rq2g13m30",
+          "id": "opmwvguvr",
+          "hostUserId": "57pun6cmv",
           "itemName": "Whey Protein",
           "desc": "A huge truck load of PROTEIN!!!!",
           "price": 5,
           "quantityGoal": 50,
           "currentTotal": 5,
-          "deadline": "2026-07-25T18:14:57.451Z",
+          "deadline": "2026-07-25T18:17:02.935Z",
           "longitude": 151.0574,
           "latitude": -33.9443,
           "participants": [
             {
-              "userId": "rq2g13m30",
+              "userId": "57pun6cmv",
               "username": "Antony C",
               "quantity": 5,
               "phoneNumber": "0400000000"
@@ -30,19 +30,19 @@
           "category": "Health & Wellness"
         },
         {
-          "id": "6m7773iu4",
-          "hostUserId": "rq2g13m30",
+          "id": "0r2z8j8v8",
+          "hostUserId": "57pun6cmv",
           "itemName": "Paper Towels",
           "desc": "Many rolls of paper towels",
           "price": 2,
           "quantityGoal": 60,
           "currentTotal": 5,
-          "deadline": "2026-07-29T18:14:57.453Z",
+          "deadline": "2026-07-29T18:17:02.936Z",
           "longitude": 151.2263,
           "latitude": -33.8849,
           "participants": [
             {
-              "userId": "rq2g13m30",
+              "userId": "57pun6cmv",
               "username": "Antony C",
               "quantity": 5,
               "phoneNumber": "0400000000"
@@ -51,374 +51,70 @@
           "category": "Health & Wellness"
         }
       ],
-      "hostReviews": [
-        {
-          "isHost": true,
-          "reviewId": "9oggtmjpp",
-          "reviewerId": "k591nhel3",
-          "revieweeId": "rq2g13m30",
-          "rating": 5,
-          "comment": "Great host! Very responsive and helpful."
-        },
-        {
-          "isHost": true,
-          "reviewId": "a8qnh74vj",
-          "reviewerId": "iloxd2d2d",
-          "revieweeId": "rq2g13m30",
-          "rating": 2,
-          "comment": "Could improve on communication."
-        },
-        {
-          "isHost": true,
-          "reviewId": "jy805f4xe",
-          "reviewerId": "0xbf3ducr",
-          "revieweeId": "rq2g13m30",
-          "rating": 4,
-          "comment": "Excellent host! Highly recommended. Kinda chopped."
-        }
-      ],
+      "hostReviews": [],
       "participantReviews": [],
-      "averageHostRating": 3.6666666666666665,
+      "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "un8vjbi9s",
-          "poolId": "ifl01f7tc",
-          "direction": "incoming",
-          "fromUserId": "k591nhel3",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "489ct5fky",
-          "poolId": "ifl01f7tc",
-          "direction": "incoming",
-          "fromUserId": "wka2pg07m",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 40
-        },
-        {
-          "requestId": "ty1spat3f",
-          "poolId": "ifl01f7tc",
-          "direction": "incoming",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 3
-        },
-        {
-          "requestId": "46ttjti6s",
-          "poolId": "ifl01f7tc",
-          "direction": "incoming",
-          "fromUserId": "96eb4lr8w",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 4
-        },
-        {
-          "requestId": "gt02241y8",
-          "poolId": "ifl01f7tc",
-          "direction": "incoming",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 7
-        },
-        {
-          "requestId": "a6uxv1mtb",
-          "poolId": "6m7773iu4",
-          "direction": "incoming",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 2
-        },
-        {
-          "requestId": "w61qiv7x6",
-          "poolId": "6m7773iu4",
-          "direction": "incoming",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 4
-        },
-        {
-          "requestId": "5tc1i0csg",
-          "poolId": "6m7773iu4",
-          "direction": "incoming",
-          "fromUserId": "b5ou7d81s",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "jfuf52k81",
-          "poolId": "6m7773iu4",
-          "direction": "incoming",
-          "fromUserId": "bnhqg97s2",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 2
-        },
-        {
-          "requestId": "h0rgehbod",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "rq2g13m30",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 20
-        },
-        {
-          "requestId": "tedc7eb6l",
-          "poolId": "85gsdxnqy",
-          "direction": "outgoing",
-          "fromUserId": "rq2g13m30",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 10
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "k591nhel3",
+      "userId": "sapdqth2a",
       "username": "Kevin Li",
       "email": "kevin@gmail.com",
-      "password": "$2b$10$0LFpcwLYlyf2EX6jr2LobuSWJeeLvLqvIvoHa1Z0V.klDzBgiab7S",
+      "password": "$2b$10$3W1DbHxaMPilYIpN3O.VveaH4Sz7suZYPV6YhmPMq.NmjrVdV5Sh2",
       "phoneNumber": "0400000001",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "nph3y7c5c",
-          "hostUserId": "k591nhel3",
+          "id": "ra4foinvq",
+          "hostUserId": "sapdqth2a",
           "itemName": "Canned Beans",
           "desc": "A lot of canned beans",
           "price": 1,
           "quantityGoal": 100,
           "currentTotal": 10,
-          "deadline": "2026-07-31T18:14:57.454Z",
+          "deadline": "2026-07-31T18:17:02.938Z",
           "longitude": 151.2743,
           "latitude": -33.8908,
           "participants": [
             {
-              "userId": "k591nhel3",
+              "userId": "sapdqth2a",
               "username": "Kevin Li",
               "quantity": 10,
               "phoneNumber": "0400000001"
             }
           ],
           "category": "Pantry & Dry Goods"
-        },
-        {
-          "id": "85gsdxnqy",
-          "hostUserId": "k591nhel3",
-          "itemName": "Special Pool (wow)",
-          "desc": "This is a special pool for demonstration purposes. Fulfill me!!",
-          "price": 5,
-          "quantityGoal": 20,
-          "currentTotal": 5,
-          "deadline": "2026-07-21T18:14:57.491Z",
-          "longitude": 151.2,
-          "latitude": -33.9,
-          "participants": [
-            {
-              "userId": "k591nhel3",
-              "username": "Kevin Li",
-              "quantity": 5,
-              "phoneNumber": "0400000001"
-            }
-          ],
-          "category": "Other"
         }
       ],
-      "hostReviews": [
-        {
-          "isHost": true,
-          "reviewId": "wbd9ni39s",
-          "reviewerId": "b5ou7d81s",
-          "revieweeId": "k591nhel3",
-          "rating": 2,
-          "comment": "Could be more organized."
-        },
-        {
-          "isHost": true,
-          "reviewId": "82iofprv4",
-          "reviewerId": "bnhqg97s2",
-          "revieweeId": "k591nhel3",
-          "rating": 3,
-          "comment": "Horrible host! Went below and under!"
-        }
-      ],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "dykrogzct",
-          "reviewerId": "rq2g13m30",
-          "revieweeId": "k591nhel3",
-          "rating": 1,
-          "comment": "Worst of all time!?!"
-        },
-        {
-          "isHost": false,
-          "reviewId": "6yzys59ih",
-          "reviewerId": "k591nhel3",
-          "revieweeId": "k591nhel3",
-          "rating": 2,
-          "comment": "He was not participating."
-        },
-        {
-          "isHost": false,
-          "reviewId": "p0vhv2viy",
-          "reviewerId": "iloxd2d2d",
-          "revieweeId": "k591nhel3",
-          "rating": 3,
-          "comment": "Violent man."
-        },
-        {
-          "isHost": false,
-          "reviewId": "yycjo44p6",
-          "reviewerId": "0xbf3ducr",
-          "revieweeId": "k591nhel3",
-          "rating": 2,
-          "comment": "Needs a shower."
-        },
-        {
-          "isHost": false,
-          "reviewId": "yyihnz7qx",
-          "reviewerId": "b5ou7d81s",
-          "revieweeId": "k591nhel3",
-          "rating": 4,
-          "comment": "Lacking in punctuality."
-        }
-      ],
-      "averageHostRating": 2.5,
-      "averageParticipantRating": 2.4,
-      "requests": [
-        {
-          "requestId": "un8vjbi9s",
-          "poolId": "ifl01f7tc",
-          "direction": "outgoing",
-          "fromUserId": "k591nhel3",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "davidlvt7",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "b5ou7d81s",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 10
-        },
-        {
-          "requestId": "5bgaperz5",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "bnhqg97s2",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 12
-        },
-        {
-          "requestId": "bcyzw0gdb",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "7h0ezq1zd",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 13
-        },
-        {
-          "requestId": "7ihtkvw9z",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "dksfhpm8b",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "h0rgehbod",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "rq2g13m30",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 20
-        },
-        {
-          "requestId": "r48x3w6si",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "y2ednl9fs",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 15
-        },
-        {
-          "requestId": "ss81khb31",
-          "poolId": "nph3y7c5c",
-          "direction": "incoming",
-          "fromUserId": "254aiysln",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 3
-        },
-        {
-          "requestId": "tedc7eb6l",
-          "poolId": "85gsdxnqy",
-          "direction": "incoming",
-          "fromUserId": "rq2g13m30",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 10
-        },
-        {
-          "requestId": "gskpnblm0",
-          "poolId": "85gsdxnqy",
-          "direction": "incoming",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "2zl7lbbje",
-          "poolId": "85gsdxnqy",
-          "direction": "incoming",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 2
-        }
-      ]
+      "hostReviews": [],
+      "participantReviews": [],
+      "averageHostRating": 0,
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "iloxd2d2d",
+      "userId": "br9a8k9v6",
       "username": "Josh P",
       "email": "josh@gmail.com",
-      "password": "$2b$10$iKJN763/xE3/rOMlQeKGzuPUPIMs26l3vrp3iZyisn7BXZl6A5eom",
+      "password": "$2b$10$ImC50NHUtJvuAgKQttcFROKuZAmBNt83EgybedW/jyv0k6n5A3HS2",
       "phoneNumber": "0400000002",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "ca9hxyb54",
-          "hostUserId": "iloxd2d2d",
+          "id": "03ydxnlyd",
+          "hostUserId": "br9a8k9v6",
           "itemName": "Dog Food",
           "desc": "Yummy delicious doggy treats!",
           "price": 3,
           "quantityGoal": 80,
           "currentTotal": 5,
-          "deadline": "2026-08-04T18:14:57.454Z",
+          "deadline": "2026-08-04T18:17:02.939Z",
           "longitude": 151.2069,
           "latitude": -33.8708,
           "participants": [
             {
-              "userId": "iloxd2d2d",
+              "userId": "br9a8k9v6",
               "username": "Josh P",
               "quantity": 5,
               "phoneNumber": "0400000002"
@@ -427,172 +123,34 @@
           "category": "Pet Supplies"
         }
       ],
-      "hostReviews": [
-        {
-          "isHost": true,
-          "reviewId": "6x9b4nkh8",
-          "reviewerId": "4gvc599uh",
-          "revieweeId": "iloxd2d2d",
-          "rating": 4,
-          "comment": "Good host. Would use again."
-        },
-        {
-          "isHost": true,
-          "reviewId": "0ajdstp0s",
-          "reviewerId": "1323qvk1o",
-          "revieweeId": "iloxd2d2d",
-          "rating": 5,
-          "comment": "Great experience! Very accommodating."
-        },
-        {
-          "isHost": true,
-          "reviewId": "89rqs339c",
-          "reviewerId": "1323qvk1o",
-          "revieweeId": "iloxd2d2d",
-          "rating": 4,
-          "comment": "Might be the goat!?!"
-        },
-        {
-          "isHost": true,
-          "reviewId": "xcv430qi7",
-          "reviewerId": "1323qvk1o",
-          "revieweeId": "iloxd2d2d",
-          "rating": 2,
-          "comment": "Who is bro?"
-        },
-        {
-          "isHost": true,
-          "reviewId": "o6c6ksokv",
-          "reviewerId": "1323qvk1o",
-          "revieweeId": "iloxd2d2d",
-          "rating": 3,
-          "comment": "Scary dog!"
-        }
-      ],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "gf20o8760",
-          "reviewerId": "rq2g13m30",
-          "revieweeId": "iloxd2d2d",
-          "rating": 4,
-          "comment": "Good experience overall, but could improve on punctuality."
-        },
-        {
-          "isHost": false,
-          "reviewId": "t0eulw9yi",
-          "reviewerId": "k591nhel3",
-          "revieweeId": "iloxd2d2d",
-          "rating": 2,
-          "comment": "Greedy greedy greedy."
-        },
-        {
-          "isHost": false,
-          "reviewId": "d1wvaez38",
-          "reviewerId": "iloxd2d2d",
-          "revieweeId": "iloxd2d2d",
-          "rating": 4,
-          "comment": "Very helpful!"
-        },
-        {
-          "isHost": false,
-          "reviewId": "kiqi8fxug",
-          "reviewerId": "0xbf3ducr",
-          "revieweeId": "iloxd2d2d",
-          "rating": 5,
-          "comment": "Amazing experience!"
-        }
-      ],
-      "averageHostRating": 3.6,
-      "averageParticipantRating": 3.75,
-      "requests": [
-        {
-          "requestId": "ty1spat3f",
-          "poolId": "ifl01f7tc",
-          "direction": "outgoing",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 3
-        },
-        {
-          "requestId": "a6uxv1mtb",
-          "poolId": "6m7773iu4",
-          "direction": "outgoing",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 2
-        },
-        {
-          "requestId": "jb9cz88lb",
-          "poolId": "ca9hxyb54",
-          "direction": "incoming",
-          "fromUserId": "4gvc599uh",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 20
-        },
-        {
-          "requestId": "mbrlv5pt5",
-          "poolId": "ca9hxyb54",
-          "direction": "incoming",
-          "fromUserId": "1323qvk1o",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 15
-        },
-        {
-          "requestId": "sk12nne2k",
-          "poolId": "ca9hxyb54",
-          "direction": "incoming",
-          "fromUserId": "17mag2rob",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 4
-        },
-        {
-          "requestId": "v3m4ball6",
-          "poolId": "ca9hxyb54",
-          "direction": "incoming",
-          "fromUserId": "f7bgw299g",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "gskpnblm0",
-          "poolId": "85gsdxnqy",
-          "direction": "outgoing",
-          "fromUserId": "iloxd2d2d",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 5
-        }
-      ]
+      "hostReviews": [],
+      "participantReviews": [],
+      "averageHostRating": 0,
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "0xbf3ducr",
+      "userId": "3q8m4dgtz",
       "username": "Ethan H",
       "email": "ethan@gmail.com",
-      "password": "$2b$10$vTDwfxtxOSXOdoBX4aVg6eOPCow1GusDzRWcgcI2/buGfF3cxlYVi",
+      "password": "$2b$10$esQGoB5EjiTcodzyIRW8fuxUO9CtOXHJQiShCxNx9DEfwUaFw.Qsq",
       "phoneNumber": "0400000003",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "qev1aidbp",
-          "hostUserId": "0xbf3ducr",
+          "id": "ien6gi0un",
+          "hostUserId": "3q8m4dgtz",
           "itemName": "Canned Tuna",
           "desc": "A lot of canned tuna",
           "price": 2,
           "quantityGoal": 70,
           "currentTotal": 10,
-          "deadline": "2026-07-27T18:14:57.455Z",
+          "deadline": "2026-07-27T18:17:02.940Z",
           "longitude": 151.2743,
           "latitude": -33.8908,
           "participants": [
             {
-              "userId": "0xbf3ducr",
+              "userId": "3q8m4dgtz",
               "username": "Ethan H",
               "quantity": 10,
               "phoneNumber": "0400000003"
@@ -601,114 +159,34 @@
           "category": "Pantry & Dry Goods"
         }
       ],
-      "hostReviews": [
-        {
-          "isHost": true,
-          "reviewId": "3xv5aeyuy",
-          "reviewerId": "y2ednl9fs",
-          "revieweeId": "0xbf3ducr",
-          "rating": 4,
-          "comment": "Good host. Communication could be better."
-        },
-        {
-          "isHost": true,
-          "reviewId": "229u3d20g",
-          "reviewerId": "01lkr77f6",
-          "revieweeId": "0xbf3ducr",
-          "rating": 5,
-          "comment": "Excellent host! Very friendly and helpful."
-        }
-      ],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "belcs1e3c",
-          "reviewerId": "rq2g13m30",
-          "revieweeId": "0xbf3ducr",
-          "rating": 5,
-          "comment": "Excellent participant! Highly recommended."
-        },
-        {
-          "isHost": false,
-          "reviewId": "6ov2ppsmr",
-          "reviewerId": "k591nhel3",
-          "revieweeId": "0xbf3ducr",
-          "rating": 3,
-          "comment": "Average participant. Could be more organized."
-        }
-      ],
-      "averageHostRating": 4.5,
-      "averageParticipantRating": 4,
-      "requests": [
-        {
-          "requestId": "gt02241y8",
-          "poolId": "ifl01f7tc",
-          "direction": "outgoing",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 7
-        },
-        {
-          "requestId": "w61qiv7x6",
-          "poolId": "6m7773iu4",
-          "direction": "outgoing",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 4
-        },
-        {
-          "requestId": "w3lehz6if",
-          "poolId": "qev1aidbp",
-          "direction": "incoming",
-          "fromUserId": "y2ednl9fs",
-          "toUserId": "0xbf3ducr",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "9bcn15fmt",
-          "poolId": "qev1aidbp",
-          "direction": "incoming",
-          "fromUserId": "01lkr77f6",
-          "toUserId": "0xbf3ducr",
-          "status": "pending",
-          "quantity": 3
-        },
-        {
-          "requestId": "2zl7lbbje",
-          "poolId": "85gsdxnqy",
-          "direction": "outgoing",
-          "fromUserId": "0xbf3ducr",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 2
-        }
-      ]
+      "hostReviews": [],
+      "participantReviews": [],
+      "averageHostRating": 0,
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "b5ou7d81s",
+      "userId": "pqeyrneuv",
       "username": "Joe Biden",
       "email": "sleepyjoe@gmail.com",
-      "password": "$2b$10$8LpLt5lDlpsuztnN.zYaYeDGRD6//LZCn/uUBcZuPk4g24Tm8oRZO",
+      "password": "$2b$10$ydOQyT1FnmWQ03mgBef0g.3.YN1IRatxiyf9zRq8N9eEeeJiQrpmu",
       "phoneNumber": "0400000004",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "fmxxv7wrp",
-          "hostUserId": "b5ou7d81s",
+          "id": "iam0b75f8",
+          "hostUserId": "pqeyrneuv",
           "itemName": "Soccer Balls",
           "desc": "HAALAND HAALAND",
           "price": 4,
           "quantityGoal": 10,
           "currentTotal": 5,
-          "deadline": "2026-08-02T18:14:57.455Z",
+          "deadline": "2026-08-02T18:17:02.941Z",
           "longitude": 151.2263,
           "latitude": -33.8849,
           "participants": [
             {
-              "userId": "b5ou7d81s",
+              "userId": "pqeyrneuv",
               "username": "Joe Biden",
               "quantity": 5,
               "phoneNumber": "0400000004"
@@ -717,105 +195,34 @@
           "category": "Sports & Outdoors"
         }
       ],
-      "hostReviews": [
-        {
-          "isHost": true,
-          "reviewId": "d4j0zykkq",
-          "reviewerId": "254aiysln",
-          "revieweeId": "b5ou7d81s",
-          "rating": 4,
-          "comment": "Good host. Would recommend."
-        },
-        {
-          "isHost": true,
-          "reviewId": "zvhrbpkhr",
-          "reviewerId": "7h0ezq1zd",
-          "revieweeId": "b5ou7d81s",
-          "rating": 5,
-          "comment": "Great experience! Very professional."
-        }
-      ],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "c81xcfivb",
-          "reviewerId": "rq2g13m30",
-          "revieweeId": "b5ou7d81s",
-          "rating": 3,
-          "comment": "Average experience. Could be more organized."
-        },
-        {
-          "isHost": false,
-          "reviewId": "haujgw5ge",
-          "reviewerId": "0xbf3ducr",
-          "revieweeId": "b5ou7d81s",
-          "rating": 2,
-          "comment": "Showed up late."
-        }
-      ],
-      "averageHostRating": 4.5,
-      "averageParticipantRating": 2.5,
-      "requests": [
-        {
-          "requestId": "5tc1i0csg",
-          "poolId": "6m7773iu4",
-          "direction": "outgoing",
-          "fromUserId": "b5ou7d81s",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "davidlvt7",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "b5ou7d81s",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 10
-        },
-        {
-          "requestId": "q3ybz8f29",
-          "poolId": "fmxxv7wrp",
-          "direction": "incoming",
-          "fromUserId": "7h0ezq1zd",
-          "toUserId": "b5ou7d81s",
-          "status": "pending",
-          "quantity": 2
-        },
-        {
-          "requestId": "mz2kj5i5r",
-          "poolId": "fmxxv7wrp",
-          "direction": "incoming",
-          "fromUserId": "wka2pg07m",
-          "toUserId": "b5ou7d81s",
-          "status": "pending",
-          "quantity": 1
-        }
-      ]
+      "hostReviews": [],
+      "participantReviews": [],
+      "averageHostRating": 0,
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "bnhqg97s2",
+      "userId": "68qhswq1e",
       "username": "Pauline",
       "email": "paul@gmail.com",
-      "password": "$2b$10$8EzSESFgoUoyMpw08P1jiOk7pINVRLY/Sk.2KfJNn.JlpUenMf22.",
+      "password": "$2b$10$wUU4IBxqB0Ltf1T6cFaNKO2QoxrfV3e.j44nChCE8FvwqisiRMhSq",
       "phoneNumber": "0400000005",
       "participatingPools": [],
       "hostingPools": [
         {
-          "id": "32cn9zi4p",
-          "hostUserId": "bnhqg97s2",
+          "id": "h2dcc63jp",
+          "hostUserId": "68qhswq1e",
           "itemName": "Hot Wheels",
           "desc": "Good ol' Hot Wheels",
           "price": 3,
           "quantityGoal": 40,
           "currentTotal": 20,
-          "deadline": "2026-08-08T18:14:57.456Z",
+          "deadline": "2026-08-08T18:17:02.943Z",
           "longitude": 151.0574,
           "latitude": -33.9443,
           "participants": [
             {
-              "userId": "bnhqg97s2",
+              "userId": "68qhswq1e",
               "username": "Pauline",
               "quantity": 20,
               "phoneNumber": "0400000005"
@@ -825,86 +232,52 @@
         }
       ],
       "hostReviews": [],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "4937kmryz",
-          "reviewerId": "bnhqg97s2",
-          "revieweeId": "bnhqg97s2",
-          "rating": 5,
-          "comment": "Fantastic participant! Went above and beyond."
-        }
-      ],
+      "participantReviews": [],
       "averageHostRating": 0,
-      "averageParticipantRating": 5,
-      "requests": [
-        {
-          "requestId": "jfuf52k81",
-          "poolId": "6m7773iu4",
-          "direction": "outgoing",
-          "fromUserId": "bnhqg97s2",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 2
-        },
-        {
-          "requestId": "5bgaperz5",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "bnhqg97s2",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 12
-        },
-        {
-          "requestId": "p1vfxrv3p",
-          "poolId": "32cn9zi4p",
-          "direction": "incoming",
-          "fromUserId": "dksfhpm8b",
-          "toUserId": "bnhqg97s2",
-          "status": "pending",
-          "quantity": 3
-        }
-      ]
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "4gvc599uh",
+      "userId": "u1ly2xiei",
       "username": "Alice T",
       "email": "alice@gmail.com",
-      "password": "$2b$10$QVCT3laujmzNHTGWENcJxekRAhlmOjhGi4KQfVnk/DuZR8BxCIMKe",
+      "password": "$2b$10$Ii10yApr0VgyAI4LwORF3.iOoIZ0ehOshQ3EHyC5RxHe8cEBDQ702",
       "phoneNumber": "0400000006",
       "participatingPools": [],
-      "hostingPools": [],
-      "hostReviews": [],
-      "participantReviews": [
+      "hostingPools": [
         {
-          "isHost": false,
-          "reviewId": "5yyo5seh9",
-          "reviewerId": "iloxd2d2d",
-          "revieweeId": "4gvc599uh",
-          "rating": 4,
-          "comment": "Good participant. Would meet again."
+          "id": "6dw2t01zw",
+          "hostUserId": "u1ly2xiei",
+          "itemName": "LEGO Sets",
+          "desc": "Amazing LEGO sets for building!",
+          "price": 10,
+          "quantityGoal": 20,
+          "currentTotal": 15,
+          "deadline": "2026-08-20T00:00:00.000Z",
+          "longitude": -33.8978,
+          "latitude": 151.2643,
+          "participants": [
+            {
+              "userId": "u1ly2xiei",
+              "username": "Alice T",
+              "quantity": 15,
+              "phoneNumber": "0400000006"
+            }
+          ],
+          "category": "Toys & Games"
         }
       ],
+      "hostReviews": [],
+      "participantReviews": [],
       "averageHostRating": 0,
-      "averageParticipantRating": 4,
-      "requests": [
-        {
-          "requestId": "jb9cz88lb",
-          "poolId": "ca9hxyb54",
-          "direction": "outgoing",
-          "fromUserId": "4gvc599uh",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 20
-        }
-      ]
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "1323qvk1o",
+      "userId": "v9ve5ein5",
       "username": "Bob Kirk",
       "email": "bob@gmail.com",
-      "password": "$2b$10$3NRVAXkiOregzkrBP9pKQudQ6VevkOQn77Cy9IydCsKhbVYe7/8Y.",
+      "password": "$2b$10$yNgvfMl1gdBEJ2/w7y/m4eP9hQZOkgPX7Vw2c0pDP8L1F7.PxXqV2",
       "phoneNumber": "0400000007",
       "participatingPools": [],
       "hostingPools": [],
@@ -912,23 +285,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "mbrlv5pt5",
-          "poolId": "ca9hxyb54",
-          "direction": "outgoing",
-          "fromUserId": "1323qvk1o",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 15
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "y2ednl9fs",
+      "userId": "o6xqek7y3",
       "username": "Charlie Moustache",
       "email": "charlie@gmail.com",
-      "password": "$2b$10$OVTFnT.d3qmGquphXUUt8Osw5fgASD01a/gspK6DkuyoXUGA6xFli",
+      "password": "$2b$10$n97yQR2m9y46Xn5McaNCzOtK6snXEqikdEKBss259PD60Pf43mSzu",
       "phoneNumber": "0400000008",
       "participatingPools": [],
       "hostingPools": [],
@@ -936,65 +299,27 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "r48x3w6si",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "y2ednl9fs",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 15
-        },
-        {
-          "requestId": "w3lehz6if",
-          "poolId": "qev1aidbp",
-          "direction": "outgoing",
-          "fromUserId": "y2ednl9fs",
-          "toUserId": "0xbf3ducr",
-          "status": "pending",
-          "quantity": 5
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "01lkr77f6",
+      "userId": "hp9tl52a5",
       "username": "Diana R",
       "email": "diana@gmail.com",
-      "password": "$2b$10$M9gJE3HiCI3bBzlyIwbZQOZes4Kj7BpG0kxB3t5qLu0I53fmfanlu",
+      "password": "$2b$10$gC7DtlB0tnMEIGM19Qy/gOgPRITnWz8Eq0y9Rp5FPsfZf93EloEWi",
       "phoneNumber": "0400000009",
       "participatingPools": [],
       "hostingPools": [],
       "hostReviews": [],
-      "participantReviews": [
-        {
-          "isHost": false,
-          "reviewId": "gsqo43662",
-          "reviewerId": "k591nhel3",
-          "revieweeId": "01lkr77f6",
-          "rating": 5,
-          "comment": "Excellent participant! Very friendly and helpful."
-        }
-      ],
+      "participantReviews": [],
       "averageHostRating": 0,
-      "averageParticipantRating": 5,
-      "requests": [
-        {
-          "requestId": "9bcn15fmt",
-          "poolId": "qev1aidbp",
-          "direction": "outgoing",
-          "fromUserId": "01lkr77f6",
-          "toUserId": "0xbf3ducr",
-          "status": "pending",
-          "quantity": 3
-        }
-      ]
+      "averageParticipantRating": 0,
+      "requests": []
     },
     {
-      "userId": "254aiysln",
+      "userId": "745q2jco9",
       "username": "Mario Mario",
       "email": "mario@gmail.com",
-      "password": "$2b$10$DKaDr6VGkBghjeuvDOWsk.cDBXviKenFIlDgk16ZQbmjFL0iWSik.",
+      "password": "$2b$10$39CLPqxvcOk7N2tsip.2rO1IYDUHNbjgLiPJQbTJWwGMujdFqyYui",
       "phoneNumber": "0400000010",
       "participatingPools": [],
       "hostingPools": [],
@@ -1002,23 +327,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "ss81khb31",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "254aiysln",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 3
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "7h0ezq1zd",
+      "userId": "o6tsagx7r",
       "username": "Jamin Lee",
       "email": "jamin@gmail.com",
-      "password": "$2b$10$98mPdiYaGkjRkjeJRcFENO3eoXmAu.rG2lB/g7yew8N0OBOWGfsQS",
+      "password": "$2b$10$/sMWUc5CsVwH.zbPBQAZd.3vtwdH9vOpB94OohReLR6Exb4Ch9/cS",
       "phoneNumber": "0400000011",
       "participatingPools": [],
       "hostingPools": [],
@@ -1026,32 +341,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "bcyzw0gdb",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "7h0ezq1zd",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 13
-        },
-        {
-          "requestId": "q3ybz8f29",
-          "poolId": "fmxxv7wrp",
-          "direction": "outgoing",
-          "fromUserId": "7h0ezq1zd",
-          "toUserId": "b5ou7d81s",
-          "status": "pending",
-          "quantity": 2
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "wka2pg07m",
+      "userId": "rijul8hph",
       "username": "Guan Yu",
       "email": "gy@gmail.com",
-      "password": "$2b$10$EEe07y.36.Fapweuu5pTW.wbYaSsmmWLQ9JFbvrU/thva/PCAIBge",
+      "password": "$2b$10$tQfKIWE2hw/g.A5SjljaseJfOGUlF9DOUZHxSF.hsPAnkIpfYJk6q",
       "phoneNumber": "04000000012",
       "participatingPools": [],
       "hostingPools": [],
@@ -1059,32 +355,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "489ct5fky",
-          "poolId": "ifl01f7tc",
-          "direction": "outgoing",
-          "fromUserId": "wka2pg07m",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 40
-        },
-        {
-          "requestId": "mz2kj5i5r",
-          "poolId": "fmxxv7wrp",
-          "direction": "outgoing",
-          "fromUserId": "wka2pg07m",
-          "toUserId": "b5ou7d81s",
-          "status": "pending",
-          "quantity": 1
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "dksfhpm8b",
+      "userId": "zdludscxh",
       "username": "Cleve Hendra",
       "email": "cleve@gmail.com",
-      "password": "$2b$10$Z2faQIorV3Ix6JG5WM1jEewjSHb7IUBOq/0WX.eTHMhOVqLT/L4Yu",
+      "password": "$2b$10$47tJNevJBVRJMzVMz/7kKONoE31RKCrSD6gwoWqm1EKoPtVlwMmZW",
       "phoneNumber": "0400000013",
       "participatingPools": [],
       "hostingPools": [],
@@ -1092,32 +369,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "7ihtkvw9z",
-          "poolId": "nph3y7c5c",
-          "direction": "outgoing",
-          "fromUserId": "dksfhpm8b",
-          "toUserId": "k591nhel3",
-          "status": "pending",
-          "quantity": 5
-        },
-        {
-          "requestId": "p1vfxrv3p",
-          "poolId": "32cn9zi4p",
-          "direction": "outgoing",
-          "fromUserId": "dksfhpm8b",
-          "toUserId": "bnhqg97s2",
-          "status": "pending",
-          "quantity": 3
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "17mag2rob",
+      "userId": "xeukell87",
       "username": "Donkey Kong",
       "email": "donkey@gmail.com",
-      "password": "$2b$10$BRb2gZd7Lfe/5mU.5hbliOF0LTcqVHg0r4AD8seMhOH1dXXVlUmgG",
+      "password": "$2b$10$isc37jzevhJDPVDWJZuyOeZXoa1h4HzHRpjlFKLu6N74tyiMIRZpe",
       "phoneNumber": "0400000014",
       "participatingPools": [],
       "hostingPools": [],
@@ -1125,23 +383,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "sk12nne2k",
-          "poolId": "ca9hxyb54",
-          "direction": "outgoing",
-          "fromUserId": "17mag2rob",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 4
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "f7bgw299g",
+      "userId": "f7cdrhl86",
       "username": "Cullen Hendra",
       "email": "cullen@gmail.com",
-      "password": "$2b$10$pmjMMxV9OKaogDBdmGtU0.wiAiRjBT9ybdT62z6pt6i37IKxONs7a",
+      "password": "$2b$10$KiNgqXR8gIkAM7hQHLD4huNdKJLK32VIor/FAPuajPzre2E1zYpHK",
       "phoneNumber": "0400000015",
       "participatingPools": [],
       "hostingPools": [],
@@ -1149,23 +397,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "v3m4ball6",
-          "poolId": "ca9hxyb54",
-          "direction": "outgoing",
-          "fromUserId": "f7bgw299g",
-          "toUserId": "iloxd2d2d",
-          "status": "pending",
-          "quantity": 5
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "96eb4lr8w",
+      "userId": "l1rxa096m",
       "username": "Adonis Chen",
       "email": "adonis@gmail.com",
-      "password": "$2b$10$L8UnG87OJkBW05ezCSc4lOeou6hhqAExrwdl5CcG4z0GFKV4O572e",
+      "password": "$2b$10$ErGHc2fOIYDbCQHalDKQkuoKGkCOS43AEtC/2DykzF7d0lLaZAo..",
       "phoneNumber": "0400000016",
       "participatingPools": [],
       "hostingPools": [],
@@ -1173,23 +411,13 @@
       "participantReviews": [],
       "averageHostRating": 0,
       "averageParticipantRating": 0,
-      "requests": [
-        {
-          "requestId": "46ttjti6s",
-          "poolId": "ifl01f7tc",
-          "direction": "outgoing",
-          "fromUserId": "96eb4lr8w",
-          "toUserId": "rq2g13m30",
-          "status": "pending",
-          "quantity": 4
-        }
-      ]
+      "requests": []
     },
     {
-      "userId": "lxpv5hsjj",
+      "userId": "i4r8x3npc",
       "username": "Demo User",
       "email": "demo@example.com",
-      "password": "$2b$10$998.5EvdixxD/1J828r3BuMx6IvBHJcb7CAZYKVdRAesg4F/8wMNe",
+      "password": "$2b$10$3AXAAZ1CYGE5rFSjVlLmMep5ir95Ti94wSV2PlOJKDVa/V1jgQA3.",
       "phoneNumber": "0400000000",
       "participatingPools": [],
       "hostingPools": [],
@@ -1202,19 +430,19 @@
   ],
   "globalPools": [
     {
-      "id": "ifl01f7tc",
-      "hostUserId": "rq2g13m30",
+      "id": "opmwvguvr",
+      "hostUserId": "57pun6cmv",
       "itemName": "Whey Protein",
       "desc": "A huge truck load of PROTEIN!!!!",
       "price": 5,
       "quantityGoal": 50,
       "currentTotal": 5,
-      "deadline": "2026-07-25T18:14:57.451Z",
+      "deadline": "2026-07-25T18:17:02.935Z",
       "longitude": 151.0574,
       "latitude": -33.9443,
       "participants": [
         {
-          "userId": "rq2g13m30",
+          "userId": "57pun6cmv",
           "username": "Antony C",
           "quantity": 5,
           "phoneNumber": "0400000000"
@@ -1223,19 +451,19 @@
       "category": "Health & Wellness"
     },
     {
-      "id": "6m7773iu4",
-      "hostUserId": "rq2g13m30",
+      "id": "0r2z8j8v8",
+      "hostUserId": "57pun6cmv",
       "itemName": "Paper Towels",
       "desc": "Many rolls of paper towels",
       "price": 2,
       "quantityGoal": 60,
       "currentTotal": 5,
-      "deadline": "2026-07-29T18:14:57.453Z",
+      "deadline": "2026-07-29T18:17:02.936Z",
       "longitude": 151.2263,
       "latitude": -33.8849,
       "participants": [
         {
-          "userId": "rq2g13m30",
+          "userId": "57pun6cmv",
           "username": "Antony C",
           "quantity": 5,
           "phoneNumber": "0400000000"
@@ -1244,19 +472,19 @@
       "category": "Health & Wellness"
     },
     {
-      "id": "nph3y7c5c",
-      "hostUserId": "k591nhel3",
+      "id": "ra4foinvq",
+      "hostUserId": "sapdqth2a",
       "itemName": "Canned Beans",
       "desc": "A lot of canned beans",
       "price": 1,
       "quantityGoal": 100,
       "currentTotal": 10,
-      "deadline": "2026-07-31T18:14:57.454Z",
+      "deadline": "2026-07-31T18:17:02.938Z",
       "longitude": 151.2743,
       "latitude": -33.8908,
       "participants": [
         {
-          "userId": "k591nhel3",
+          "userId": "sapdqth2a",
           "username": "Kevin Li",
           "quantity": 10,
           "phoneNumber": "0400000001"
@@ -1265,19 +493,19 @@
       "category": "Pantry & Dry Goods"
     },
     {
-      "id": "ca9hxyb54",
-      "hostUserId": "iloxd2d2d",
+      "id": "03ydxnlyd",
+      "hostUserId": "br9a8k9v6",
       "itemName": "Dog Food",
       "desc": "Yummy delicious doggy treats!",
       "price": 3,
       "quantityGoal": 80,
       "currentTotal": 5,
-      "deadline": "2026-08-04T18:14:57.454Z",
+      "deadline": "2026-08-04T18:17:02.939Z",
       "longitude": 151.2069,
       "latitude": -33.8708,
       "participants": [
         {
-          "userId": "iloxd2d2d",
+          "userId": "br9a8k9v6",
           "username": "Josh P",
           "quantity": 5,
           "phoneNumber": "0400000002"
@@ -1286,19 +514,19 @@
       "category": "Pet Supplies"
     },
     {
-      "id": "qev1aidbp",
-      "hostUserId": "0xbf3ducr",
+      "id": "ien6gi0un",
+      "hostUserId": "3q8m4dgtz",
       "itemName": "Canned Tuna",
       "desc": "A lot of canned tuna",
       "price": 2,
       "quantityGoal": 70,
       "currentTotal": 10,
-      "deadline": "2026-07-27T18:14:57.455Z",
+      "deadline": "2026-07-27T18:17:02.940Z",
       "longitude": 151.2743,
       "latitude": -33.8908,
       "participants": [
         {
-          "userId": "0xbf3ducr",
+          "userId": "3q8m4dgtz",
           "username": "Ethan H",
           "quantity": 10,
           "phoneNumber": "0400000003"
@@ -1307,19 +535,19 @@
       "category": "Pantry & Dry Goods"
     },
     {
-      "id": "fmxxv7wrp",
-      "hostUserId": "b5ou7d81s",
+      "id": "iam0b75f8",
+      "hostUserId": "pqeyrneuv",
       "itemName": "Soccer Balls",
       "desc": "HAALAND HAALAND",
       "price": 4,
       "quantityGoal": 10,
       "currentTotal": 5,
-      "deadline": "2026-08-02T18:14:57.455Z",
+      "deadline": "2026-08-02T18:17:02.941Z",
       "longitude": 151.2263,
       "latitude": -33.8849,
       "participants": [
         {
-          "userId": "b5ou7d81s",
+          "userId": "pqeyrneuv",
           "username": "Joe Biden",
           "quantity": 5,
           "phoneNumber": "0400000004"
@@ -1328,19 +556,19 @@
       "category": "Sports & Outdoors"
     },
     {
-      "id": "32cn9zi4p",
-      "hostUserId": "bnhqg97s2",
+      "id": "h2dcc63jp",
+      "hostUserId": "68qhswq1e",
       "itemName": "Hot Wheels",
       "desc": "Good ol' Hot Wheels",
       "price": 3,
       "quantityGoal": 40,
       "currentTotal": 20,
-      "deadline": "2026-08-08T18:14:57.456Z",
+      "deadline": "2026-08-08T18:17:02.943Z",
       "longitude": 151.0574,
       "latitude": -33.9443,
       "participants": [
         {
-          "userId": "bnhqg97s2",
+          "userId": "68qhswq1e",
           "username": "Pauline",
           "quantity": 20,
           "phoneNumber": "0400000005"
@@ -1349,25 +577,25 @@
       "category": "Toys & Games"
     },
     {
-      "id": "85gsdxnqy",
-      "hostUserId": "k591nhel3",
-      "itemName": "Special Pool (wow)",
-      "desc": "This is a special pool for demonstration purposes. Fulfill me!!",
-      "price": 5,
+      "id": "6dw2t01zw",
+      "hostUserId": "u1ly2xiei",
+      "itemName": "LEGO Sets",
+      "desc": "Amazing LEGO sets for building!",
+      "price": 10,
       "quantityGoal": 20,
-      "currentTotal": 5,
-      "deadline": "2026-07-21T18:14:57.491Z",
-      "longitude": 151.2,
-      "latitude": -33.9,
+      "currentTotal": 15,
+      "deadline": "2026-08-20T00:00:00.000Z",
+      "longitude": -33.8978,
+      "latitude": 151.2643,
       "participants": [
         {
-          "userId": "k591nhel3",
-          "username": "Kevin Li",
-          "quantity": 5,
-          "phoneNumber": "0400000001"
+          "userId": "u1ly2xiei",
+          "username": "Alice T",
+          "quantity": 15,
+          "phoneNumber": "0400000006"
         }
       ],
-      "category": "Other"
+      "category": "Toys & Games"
     }
   ],
   "sessions": []
