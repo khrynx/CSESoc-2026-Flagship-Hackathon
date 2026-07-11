@@ -1463,8 +1463,12 @@ function App() {
 
         <header className="home-topbar">
           <div className="brand-row home-brand">
-            <div className="brand-badge">N</div>
-            <span className="brand-name">Neighbourly</span>
+            <div className="brand-badge" aria-label="Shopping cart logo">
+              <svg className="brand-badge-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M7 18a2 2 0 1 0 0 4a2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M6.2 4l.5 2H21a1 1 0 0 1 .97 1.24l-1.5 6A2 2 0 0 1 18.53 15H9a2 2 0 0 1-1.95-1.55L5.1 4.9L4.7 3H2a1 1 0 1 1 0-2h3.5a1 1 0 0 1 .98.8L6.2 4Z"/>
+              </svg>
+            </div>
+            <span className="brand-name">CartPool</span>
             {currentUser ? <span className="home-brand-user">@{currentUser.username}</span> : null}
           </div>
           <div className="home-topbar-actions">
@@ -1709,8 +1713,12 @@ function App() {
         <section className="auth-card">
           <div className="auth-hero">
             <div className="brand-row">
-              <div className="brand-badge">N</div>
-              <span>Neighbourly</span>
+              <div className="brand-badge" aria-label="Shopping cart logo">
+                <svg className="brand-badge-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M7 18a2 2 0 1 0 0 4a2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M6.2 4l.5 2H21a1 1 0 0 1 .97 1.24l-1.5 6A2 2 0 0 1 18.53 15H9a2 2 0 0 1-1.95-1.55L5.1 4.9L4.7 3H2a1 1 0 1 1 0-2h3.5a1 1 0 0 1 .98.8L6.2 4Z"/>
+                </svg>
+              </div>
+              <span>CartPool</span>
             </div>
             <h1>Welcome back</h1>
             <p>Log in to see local group buys, manage your shares, and keep your community updates close by.</p>
@@ -1748,7 +1756,7 @@ function App() {
           ) : (
             <form className="auth-form" onSubmit={handleSignupSubmit}>
               <h2>Create account</h2>
-              <p className="auth-intro">Join Neighbourly to start sharing group buys.</p>
+              <p className="auth-intro">Join CartPool to start sharing group buys.</p>
 
               <label className="input-group">
                 <span>Full name</span>
@@ -1793,8 +1801,12 @@ function App() {
           <button type="button" className="ghost-btn" onClick={handleRedoReset}>
             Reset data
           </button>
-          <div className="brand-badge">N</div>
-          <span className="brand-name">Neighbourly</span>
+          <div className="brand-badge" aria-label="Shopping cart logo">
+            <svg className="brand-badge-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M7 18a2 2 0 1 0 0 4a2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4M6.2 4l.5 2H21a1 1 0 0 1 .97 1.24l-1.5 6A2 2 0 0 1 18.53 15H9a2 2 0 0 1-1.95-1.55L5.1 4.9L4.7 3H2a1 1 0 1 1 0-2h3.5a1 1 0 0 1 .98.8L6.2 4Z"/>
+            </svg>
+          </div>
+          <span className="brand-name">CartPool</span>
         </div>
         <div className="topbar-actions">
           <button type="button" className="ghost-btn" onClick={() => setView('home')}>

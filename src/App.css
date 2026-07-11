@@ -690,15 +690,21 @@
 }
 
 .brand-badge {
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, #152d4d, #1c4b7b);
   color: white;
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+}
+
+.brand-badge-logo {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .brand-name {
