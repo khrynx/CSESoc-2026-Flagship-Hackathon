@@ -50,7 +50,7 @@ interface Session {
     userId: string;
 }
 
-interface Review {
+export interface Review {
     isHost: boolean; // true if the reviewee is the host, false if the reviewee is a participant
     reviewId: string;
     reviewerId: string;
