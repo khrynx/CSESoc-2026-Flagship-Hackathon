@@ -26,6 +26,14 @@ export interface Pool {
     category: Category;
 }
 
+export interface Request {
+    poolId: string;
+    direction: 'outgoing' | 'incoming';
+    fromUserId: string;
+    toUserId: string;
+    status: 'pending' | 'accepted' | 'rejected';
+}
+
 export interface User {
     userId: string;
     username: string;
@@ -38,6 +46,7 @@ export interface User {
     participantReviews: Review[]; // reviews received as a participant
     averageHostRating: number; // average rating received as a host
     averageParticipantRating: number; // average rating received as a participant
+    requests: Request[];
 }
 
 export interface Data {

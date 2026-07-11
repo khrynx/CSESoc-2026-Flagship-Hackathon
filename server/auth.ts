@@ -38,7 +38,8 @@ export function registerUser(username:string, email:string, password:string, pho
         hostReviews: emptyReviews,
         participantReviews: emptyReviews,
         averageHostRating: 0,
-        averageParticipantRating: 0
+        averageParticipantRating: 0,
+        requests: []
     };
 
     data.users.push(user);
