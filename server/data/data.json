@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "userId": "e2k9vn1m8",
+      "username": "Demo User",
+      "email": "demo@example.com",
+      "password": "$2b$10$5Jq7rw8hQeuYKIAdWXpJzuJuWH0foHvS0gE7Fw7O54OcP7EBlhuhm",
+      "phoneNumber": "0400000000",
+      "pools": []
+    }
+  ],
+  "globalPools": [],
+  "sessions": []
+}

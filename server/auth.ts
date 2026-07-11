@@ -1,4 +1,4 @@
-import { getData, generateUserId, type Pool, type User } from './dataStore.js';
+import { getData, generateUserId, persistData, type Pool, type User } from './dataStore.js';
 import bcrypt from 'bcrypt';
 
 export function registerUser(username:string, email:string, password:string, phoneNumber:string) {
@@ -35,6 +35,7 @@ export function registerUser(username:string, email:string, password:string, pho
     };
 
     data.users.push(user);
+    persistData();
     return user;
 }
 
@@ -78,4 +79,6 @@ export function editProfile(userId:string, newUsername?:string, newEmail?:string
     if (newPhoneNumber !== undefined) {
         user.phoneNumber = newPhoneNumber;
     }
+
+    persistData();
 }
