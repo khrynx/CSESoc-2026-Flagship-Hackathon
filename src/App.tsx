@@ -293,7 +293,7 @@ function App() {
 
               <label className="input-group">
                 <span>Full name</span>
-                <input name="username" placeholder="Alex Nguyen" value={signupData.username} onChange={handleSignupChange} />
+                <input name="username" placeholder="Kevin Li" value={signupData.username} onChange={handleSignupChange} />
               </label>
 
               <label className="input-group">

@@ -15,6 +15,14 @@
       "password": "$2b$10$YQPrQ2Qh2QumB1gYpBkX1.dGkb3yoShT4dBDq8cxseX8jIzJpLZOa",
       "phoneNumber": "1",
       "pools": []
+    },
+    {
+      "userId": "vazskm12l",
+      "username": "hi lol",
+      "email": "yeetusdeletusmcfeetus@gmail.com",
+      "password": "$2b$10$CIpyfpdBHr5nMcGhuocOUu2qAEia4Wrz68uADecYmK7WFFlA55pBS",
+      "phoneNumber": "2",
+      "pools": []
     }
   ],
   "globalPools": [],
