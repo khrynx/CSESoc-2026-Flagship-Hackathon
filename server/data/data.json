@@ -27,6 +27,27 @@
             }
           ],
           "category": "Clothing"
+        },
+        {
+          "id": "k3ssaea56",
+          "hostUserId": "e2k9vn1m8",
+          "itemName": "skibidi",
+          "desc": "nick",
+          "price": 67,
+          "quantityGoal": 100,
+          "currentTotal": 10,
+          "deadline": "2026-07-24T01:00:00.000Z",
+          "longitude": 150.908545,
+          "latitude": -33.944691,
+          "participants": [
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 10,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Beverages"
         }
       ],
       "participatingPools": [
@@ -58,7 +79,8 @@
         }
       ],
       "hostReviews": [],
-      "participantReviews": []
+      "participantReviews": [],
+      "requests": []
     },
     {
       "userId": "dez7v6c44",
@@ -132,7 +154,8 @@
       ],
       "participatingPools": [],
       "hostReviews": [],
-      "participantReviews": []
+      "participantReviews": [],
+      "requests": []
     },
     {
       "userId": "vazskm12l",
@@ -144,7 +167,8 @@
       "hostingPools": [],
       "participatingPools": [],
       "hostReviews": [],
-      "participantReviews": []
+      "participantReviews": [],
+      "requests": []
     }
   ],
   "globalPools": [
@@ -216,6 +240,27 @@
       ],
       "category": "Clothing",
       "hostUserId": "e2k9vn1m8"
+    },
+    {
+      "id": "k3ssaea56",
+      "hostUserId": "e2k9vn1m8",
+      "itemName": "skibidi",
+      "desc": "nick",
+      "price": 67,
+      "quantityGoal": 100,
+      "currentTotal": 10,
+      "deadline": "2026-07-24T01:00:00.000Z",
+      "longitude": 150.908545,
+      "latitude": -33.944691,
+      "participants": [
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 10,
+          "phoneNumber": "0400000000"
+        }
+      ],
+      "category": "Beverages"
     }
   ],
   "sessions": [
@@ -273,6 +318,10 @@
     },
     {
       "sessionId": "jcorejyo7",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "3ov0s3wpd",
       "userId": "e2k9vn1m8"
     }
   ]

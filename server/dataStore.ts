@@ -122,6 +122,9 @@ function normalizeData(rawData: Partial<Data> | null | undefined): Data {
             participantReviews: Array.isArray((user as Partial<User>).participantReviews)
                 ? (user as Partial<User>).participantReviews ?? []
                 : [],
+            requests: Array.isArray((user as Partial<User>).requests)
+                ? (user as Partial<User>).requests ?? []
+                : [],
         }))
         : [];
 

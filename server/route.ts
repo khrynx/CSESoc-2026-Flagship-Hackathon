@@ -1,4 +1,5 @@
 import express from 'express'
+import { getUserById } from './auth.js'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { cleanupInactivePools, getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
@@ -139,6 +140,15 @@ router.get('/users/:userId/pools', (req, res) => {
     res.json({ pools: getUserParticipantPools(req.params.userId) })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user pools.' })
+  }
+})
+
+router.get('/users/:userId/requests', (req, res) => {
+  try {
+    const user = getUserById(req.params.userId)
+    res.json({ requests: user?.requests ?? [] })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user requests.' })
   }
 })
 

@@ -39,6 +39,14 @@ type Pool = {
   participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
 }
 
+type UserRequest = {
+  poolId: string
+  direction: 'outgoing' | 'incoming'
+  fromUserId: string
+  toUserId: string
+  status: 'pending' | 'accepted' | 'rejected'
+}
+
 const poolCategories = [
   'Clothing',
   'Beverages',
@@ -150,6 +158,7 @@ function App() {
   const [selectedLocation, setSelectedLocation] = useState<{ lng: number; lat: number } | null>(null)
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
   const [pools, setPools] = useState<Pool[]>([])
+  const [userRequests, setUserRequests] = useState<UserRequest[]>([])
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -167,6 +176,8 @@ function App() {
     }
     return pools.filter((pool) => pool.participants.some((participant) => participant.userId === currentUser.userId))
   }, [currentUser?.userId, pools])
+
+  const pendingRequestCount = userRequests.filter((request) => request.status === 'pending').length
 
   const getPoolMarkerColor = (pool: Pool): string => {
     const fullness = Math.max(0, Math.min(1, pool.currentTotal / pool.quantityGoal))
@@ -297,6 +308,40 @@ function App() {
       window.clearInterval(pollId)
     }
   }, [activeSearchQuery, distanceFilter, homeSearchQuery, homeDistanceFilter, userLocation])
+
+  useEffect(() => {
+    if (!currentUser?.userId) {
+      setUserRequests([])
+      return
+    }
+
+    let cancelled = false
+
+    const refreshUserRequests = async () => {
+      try {
+        const response = await fetch(`/api/users/${currentUser.userId}/requests`)
+        const data = await parseApiResponse(response)
+
+        if (!cancelled && response.ok) {
+          setUserRequests(Array.isArray(data.requests) ? data.requests : [])
+        }
+      } catch {
+        if (!cancelled) {
+          setUserRequests([])
+        }
+      }
+    }
+
+    void refreshUserRequests()
+    const pollId = window.setInterval(() => {
+      void refreshUserRequests()
+    }, 1000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(pollId)
+    }
+  }, [currentUser?.userId])
 
   const retryMap = (source: 'manual' | 'auto' = 'manual') => {
     if (source === 'auto' && hasAutoRetriedRef.current) {
@@ -812,7 +857,11 @@ function App() {
             <span className="brand-name">Neighbourly</span>
           </div>
           <div className="home-topbar-actions">
-            
+            {currentUser ? (
+              <span className="home-pending-count">
+                {pendingRequestCount} pending request{pendingRequestCount === 1 ? '' : 's'}
+              </span>
+            ) : null}
             <button type="button" className="home-ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
               Log out
             </button>
