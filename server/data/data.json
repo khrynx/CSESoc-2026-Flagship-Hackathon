@@ -56,11 +56,111 @@
             }
           ],
           "category": "Snacks"
+        },
+        {
+          "id": "6891apj6j",
+          "itemName": "josh pradhan",
+          "desc": "the goat",
+          "price": 999,
+          "quantityGoal": 888,
+          "currentTotal": 4,
+          "deadline": "2026-07-31T02:01:00.000Z",
+          "longitude": 151.207487,
+          "latitude": -33.883797,
+          "participants": [
+            {
+              "userId": "dez7v6c44",
+              "username": "Kevin Li",
+              "quantity": 1,
+              "phoneNumber": "1"
+            },
+            {
+              "userId": "e2k9vn1m8",
+              "username": "Demo User",
+              "quantity": 4,
+              "phoneNumber": "0400000000"
+            }
+          ],
+          "category": "Clothing",
+          "hostUserId": "dez7v6c44"
         }
       ],
       "hostReviews": [],
       "participantReviews": [],
-      "requests": []
+      "requests": [
+        {
+          "requestId": "n1pw3un9t",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "rejected",
+          "quantity": 1
+        },
+        {
+          "requestId": "fix35uqv2",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "rejected",
+          "quantity": 1
+        },
+        {
+          "requestId": "tfa16airf",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "accepted",
+          "quantity": 1
+        },
+        {
+          "requestId": "lhc3xrhew",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "accepted",
+          "quantity": 1
+        },
+        {
+          "requestId": "5duyi0kbv",
+          "poolId": "7f0ucerfm",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "accepted",
+          "quantity": 1
+        },
+        {
+          "requestId": "yjo6wmrz7",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "rejected",
+          "quantity": 1
+        },
+        {
+          "requestId": "repaek7n5",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "accepted",
+          "quantity": 1
+        },
+        {
+          "requestId": "62lkct4ur",
+          "poolId": "6891apj6j",
+          "direction": "outgoing",
+          "fromUserId": "e2k9vn1m8",
+          "toUserId": "dez7v6c44",
+          "status": "accepted",
+          "quantity": 1
+        }
+      ]
     },
     {
       "userId": "dez7v6c44",
@@ -158,7 +258,7 @@
       "desc": "hes dumb",
       "price": 69,
       "quantityGoal": 999,
-      "currentTotal": 1,
+      "currentTotal": 2,
       "deadline": "2026-07-31T11:52:00.000Z",
       "longitude": 151.207309,
       "latitude": -33.87428,
@@ -172,7 +272,7 @@
         {
           "userId": "e2k9vn1m8",
           "username": "Demo User",
-          "quantity": 1,
+          "quantity": 2,
           "phoneNumber": "0400000000"
         }
       ],
@@ -185,7 +285,7 @@
       "desc": "the goat",
       "price": 999,
       "quantityGoal": 888,
-      "currentTotal": 0,
+      "currentTotal": 4,
       "deadline": "2026-07-31T02:01:00.000Z",
       "longitude": 151.207487,
       "latitude": -33.883797,
@@ -195,6 +295,12 @@
           "username": "Kevin Li",
           "quantity": 1,
           "phoneNumber": "1"
+        },
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 4,
+          "phoneNumber": "0400000000"
         }
       ],
       "category": "Clothing",
@@ -294,6 +400,30 @@
     {
       "sessionId": "2vhy5seq4",
       "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "ux0ztk009",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "31aqw88b0",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "xr6y3vwcg",
+      "userId": "e2k9vn1m8"
+    },
+    {
+      "sessionId": "qy55z9qvg",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "um5ml2hkv",
+      "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "syxpidjtn",
+      "userId": "e2k9vn1m8"
     }
   ]
 }

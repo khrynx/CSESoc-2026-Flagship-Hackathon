@@ -17,6 +17,21 @@ export function createRequest(userId: string, poolId: string, quantity: number) 
         throw new Error('Host not found');
     }
 
+    if (pool.hostUserId === userId) {
+        throw new Error('Host cannot request to join their own pool');
+    }
+
+    const hasPendingOutgoing = user.requests.some(
+        (request) =>
+            request.poolId === poolId &&
+            request.direction === 'outgoing' &&
+            request.status === 'pending',
+    );
+
+    if (hasPendingOutgoing) {
+        throw new Error('You already have a pending request for this pool');
+    }
+
     const requestId = generateRequestId();
 
     // one requestId refers to a pair of ongoing, incoming requests
@@ -42,6 +57,13 @@ export function createRequest(userId: string, poolId: string, quantity: number) 
 
     user.requests.push(newOutgoingRequest);
     host.requests.push(newIncomingRequest);
+
+    persistData();
+
+    return {
+        requestId,
+        request: newOutgoingRequest,
+    };
 }
 
 // can only decline or accept incoming requests as the host
@@ -73,6 +95,7 @@ export function declineRequest(userId: string, requestId: string) {
         throw new Error('Request not found or not an outgoing request');
     }
     participantRequest.status = 'rejected';
+    persistData();
 
     // ask kevin to make an x button that will splice the participant's request after clicking X and seeing that it has been declined
 }
@@ -117,11 +140,11 @@ export function acceptRequest(userId: string, requestId: string) {
     const quantity = participantRequest.quantity;
     pool.currentTotal += quantity;
 
-    const existingParticipant = pool.participants.find((participant) => participant.userId === userId);
+    const existingParticipant = pool.participants.find((participant) => participant.userId === participantId);
     if (existingParticipant) {
         existingParticipant.quantity += quantity;
     } else {
-        pool.participants.push({ userId, username: participant.username, quantity, phoneNumber: participant.phoneNumber });
+        pool.participants.push({ userId: participantId, username: participant.username, quantity, phoneNumber: participant.phoneNumber });
     }
 
     if (!participant.participatingPools.some((p) => p.id === pool.id)) {

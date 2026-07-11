@@ -33,7 +33,12 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
     }
 
     // send a request to the host to join the pool
-    createRequest(userId, poolId, quantity);
+    const created = createRequest(userId, poolId, quantity);
+    return {
+        requestCreated: true,
+        requestId: created.requestId,
+        message: 'Join request sent to host.',
+    };
 }
 
 export function getHost(userId: string, poolId: string) {

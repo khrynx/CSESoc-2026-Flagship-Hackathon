@@ -3,6 +3,7 @@ import { getUserById } from './auth.js'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { cleanupInactivePools, getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
+import { acceptRequest, declineRequest } from './permissions.js'
 import { filterAllPools, searchPools } from './search.js'
 
 const router = express.Router()
@@ -146,9 +147,50 @@ router.get('/users/:userId/pools', (req, res) => {
 router.get('/users/:userId/requests', (req, res) => {
   try {
     const user = getUserById(req.params.userId)
-    res.json({ requests: user?.requests ?? [] })
+    const { users } = getData()
+    const requests = (user?.requests ?? []).map((request) => {
+      const sender = users.find((candidate) => candidate.userId === request.fromUserId)
+      return {
+        ...request,
+        fromUsername: sender?.username ?? request.fromUserId,
+      }
+    })
+
+    res.json({ requests })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user requests.' })
+  }
+})
+
+router.post('/requests/:requestId/accept', (req, res) => {
+  try {
+    const { userId } = req.body ?? {}
+
+    if (!userId) {
+      res.status(400).json({ message: 'User id is required.' })
+      return
+    }
+
+    const result = acceptRequest(userId, req.params.requestId)
+    res.json({ message: 'Request accepted.', ...result })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to accept request.' })
+  }
+})
+
+router.post('/requests/:requestId/decline', (req, res) => {
+  try {
+    const { userId } = req.body ?? {}
+
+    if (!userId) {
+      res.status(400).json({ message: 'User id is required.' })
+      return
+    }
+
+    declineRequest(userId, req.params.requestId)
+    res.json({ message: 'Request declined.' })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to decline request.' })
   }
 })
 

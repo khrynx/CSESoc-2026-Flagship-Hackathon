@@ -40,9 +40,12 @@ type Pool = {
 }
 
 type UserRequest = {
+  requestId: string
+  quantity: number
   poolId: string
   direction: 'outgoing' | 'incoming'
   fromUserId: string
+  fromUsername?: string
   toUserId: string
   status: 'pending' | 'accepted' | 'rejected'
 }
@@ -176,6 +179,7 @@ function App() {
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
   const [pools, setPools] = useState<Pool[]>([])
   const [userRequests, setUserRequests] = useState<UserRequest[]>([])
+  const [homeRequestMessage, setHomeRequestMessage] = useState('')
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -194,7 +198,16 @@ function App() {
     return pools.filter((pool) => pool.participants.some((participant) => participant.userId === currentUser.userId))
   }, [currentUser?.userId, pools])
 
-  const pendingRequestCount = userRequests.filter((request) => request.status === 'pending').length
+  const incomingHostRequests = useMemo(() => {
+    if (!currentUser?.userId) {
+      return []
+    }
+    return userRequests.filter(
+      (request) => request.direction === 'incoming' && request.status === 'pending' && request.toUserId === currentUser.userId,
+    )
+  }, [currentUser?.userId, userRequests])
+
+  const pendingRequestCount = userRequests.filter((request) => request.direction === 'incoming' && request.status === 'pending').length
 
   const getPoolMarkerColor = (pool: Pool): string => {
     const fullness = Math.max(0, Math.min(1, pool.currentTotal / pool.quantityGoal))
@@ -780,21 +793,71 @@ function App() {
         throw new Error(data.message || 'Unable to join pool.')
       }
 
+      setPoolMessage(data.message || 'Join request sent to host.')
+    } catch (error) {
+      setPoolMessage(error instanceof Error ? error.message : 'Unable to join pool.')
+    }
+  }
+
+  const handleDeclineRequest = async (requestId: string) => {
+    if (!currentUser?.userId) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/requests/${requestId}/decline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.userId }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to decline request.')
+      }
+
+      setUserRequests((current) => current.filter((request) => request.requestId !== requestId || request.direction !== 'incoming'))
+      setHomeRequestMessage('Request declined.')
+    } catch (error) {
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to decline request.')
+    }
+  }
+
+  const handleAcceptRequest = async (requestId: string, poolId: string) => {
+    if (!currentUser?.userId) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/requests/${requestId}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.userId }),
+      })
+
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to accept request.')
+      }
+
+      setUserRequests((current) => current.filter((request) => request.requestId !== requestId || request.direction !== 'incoming'))
+
       if (data.removed || !data.pool) {
         setPools((current) => current.filter((pool) => pool.id !== poolId))
         setDisplayedPools((current) => current.filter((pool) => pool.id !== poolId))
-        setSelectedPoolId(null)
-        setPoolMessage('Joined successfully. Pool is now fulfilled/closed and has been removed.')
+        setSelectedPoolId((current) => (current === poolId ? null : current))
+        setHomeRequestMessage('Request accepted. Pool is now fulfilled/closed and has been removed.')
         return
       }
 
       const updatedPool = data.pool as Pool
       setPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
       setDisplayedPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
-      setSelectedPoolId(updatedPool.id)
-      setPoolMessage('Joined pool successfully.')
+      setHomeRequestMessage('Request accepted.')
     } catch (error) {
-      setPoolMessage(error instanceof Error ? error.message : 'Unable to join pool.')
+      setHomeRequestMessage(error instanceof Error ? error.message : 'Unable to accept request.')
     }
   }
 
@@ -926,6 +989,45 @@ function App() {
               })}
             </ul>
           )}
+        </aside>
+
+        <aside className="home-requests home-requests-rail" onClick={(e) => e.stopPropagation()}>
+          <div className="home-my-pools-header">
+            <h3>Join requests</h3>
+            <span>{incomingHostRequests.length}</span>
+          </div>
+          {incomingHostRequests.length === 0 ? (
+            <p className="home-my-pools-empty">No pending requests for your hosted pools.</p>
+          ) : (
+            <ul className="home-my-pools-list">
+              {incomingHostRequests.map((request) => {
+                const requestPool = pools.find((pool) => pool.id === request.poolId)
+                return (
+                  <li key={request.requestId} className="home-request-item">
+                    <button
+                      type="button"
+                      className="home-request-close"
+                      title="Decline request"
+                      onClick={() => void handleDeclineRequest(request.requestId)}
+                    >
+                      ✕
+                    </button>
+                    <strong>{requestPool?.itemName ?? 'Unknown pool'}</strong>
+                    <span>From: {request.fromUsername ?? request.fromUserId}</span>
+                    <span>Requested qty: {request.quantity}</span>
+                    <button
+                      type="button"
+                      className="home-request-accept"
+                      onClick={() => void handleAcceptRequest(request.requestId, request.poolId)}
+                    >
+                      Accept
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          {homeRequestMessage ? <p className="home-request-message">{homeRequestMessage}</p> : null}
         </aside>
 
         <header className="home-topbar">
@@ -1493,6 +1595,9 @@ function App() {
             </div>
             <div className="popup-body">
               <p className="pool-desc">{selectedPool.desc}</p>
+              {!isHostedByCurrentUser(selectedPool) ? (
+                <p className="detail-host">Hosted by: {selectedPool.participants.find((participant) => participant.userId === selectedPool.hostUserId)?.username ?? selectedPool.participants[0]?.username ?? 'Unknown host'}</p>
+              ) : null}
               <div className="detail-grid">
                 <div><span>Price</span><strong>${selectedPool.price}</strong></div>
                 <div><span>Goal</span><strong>{selectedPool.quantityGoal} units</strong></div>
@@ -1506,9 +1611,15 @@ function App() {
                   <p className="pool-desc">No participants yet. Be the first!</p>
                 ) : (
                   <ul className="participants-list">
-                    {selectedPool.participants.map((p) => (
-                      <li key={p.userId}>{p.username} — {p.quantity} units</li>
-                    ))}
+                    {selectedPool.participants.map((p) => {
+                      const showPhone = isHostedByCurrentUser(selectedPool)
+                      return (
+                        <li key={p.userId}>
+                          <span className="participant-main">{p.username} — {p.quantity} units</span>
+                          {showPhone ? <span className="participant-phone">{p.phoneNumber}</span> : null}
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
               </div>
@@ -1523,7 +1634,7 @@ function App() {
                   />
                 </label>
                 <button type="button" className="primary-btn" onClick={() => handleJoinPool(selectedPool.id)}>
-                  Join pool
+                  Request to join
                 </button>
               </div>
               {poolMessage && <p className="form-message success">{poolMessage}</p>}
