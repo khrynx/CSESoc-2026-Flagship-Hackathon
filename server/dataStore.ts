@@ -43,6 +43,26 @@ const data: Data = {
     globalPools: []
 };
 
+export function generatePoolId() {
+    const { globalPools } = getData();
+    let randid = Math.random().toString(36).substr(2, 9);
+    while (globalPools.some(pool => pool.id === randid)) { 
+        randid = Math.random().toString(36).substr(2, 9);
+    }
+    
+    return  randid;
+}   
+
+export function generateUserId() {
+    const { users } = getData();
+    let randid = Math.random().toString(36).substr(2, 9);
+    while (users.some(user => user.userId === randid)) { 
+        randid = Math.random().toString(36).substr(2, 9);
+    }
+    
+    return  randid;
+}   
+
 export function getData() {
     return data;
 };
