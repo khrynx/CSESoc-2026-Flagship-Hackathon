@@ -1,9 +1,9 @@
-import { getData, generateUserId, type Pool } from './dataStore.js';
+import { getData, generateUserId, type Pool, type User } from './dataStore.js';
 import bcrypt from 'bcrypt';
 
-export function regsiterUser(username:string, email:string, password:string, phoneNumber:string) {
+export function registerUser(username:string, email:string, password:string, phoneNumber:string) {
     const data = getData();
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -16,24 +16,35 @@ export function regsiterUser(username:string, email:string, password:string, pho
         throw new Error("Password must contain at least one special character");
     }
 
+    const existingUser = data.users.find(user => user.email === email.toLowerCase());
+    if (existingUser) {
+        throw new Error("Email already in use");
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password before storing
 
     const userId = generateUserId();
     const pools: Pool[] = [];
-
-    data.users.push({
-        userId: userId,
+    const user: User = {
+        userId,
         username,
-        email,
+        email: email.toLowerCase(),
         password: hashedPassword,
         phoneNumber,
         pools
-    });
+    };
+
+    data.users.push(user);
+    return user;
+}
+
+export function getUserById(userId:string) {
+    return getData().users.find(user => user.userId === userId);
 }
 
 export function loginUser(email:string, inputPassword:string) {
     const data = getData();
-    const user = data.users.find(user => user.email === email);
+    const user = data.users.find(user => user.email === email.toLowerCase());
 
     if (!user) {
         throw new Error("Email not found");
@@ -59,7 +70,7 @@ export function editProfile(userId:string, newUsername?:string, newEmail?:string
         user.username = newUsername;
     }
     if (newEmail !== undefined) {
-        user.email = newEmail;
+        user.email = newEmail.toLowerCase();
     }
     if (newPassword !== undefined) {
         user.password = bcrypt.hashSync(newPassword, 10);

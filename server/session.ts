@@ -7,9 +7,14 @@ export function createSession(userId: string): string {
     return sessionId;
 }
 
+export function getSession(sessionId: string) {
+    const data = getData();
+    return data.sessions.find(session => session.sessionId === sessionId);
+}
+
 export function removeSession(sessionId: string): void {
     const data = getData();
-    const sessionIndex = data.sessions.findIndex(session => session.sessionId === sessionId); 
+    const sessionIndex = data.sessions.findIndex(session => session.sessionId === sessionId);
     if (sessionIndex !== -1) {
         data.sessions.splice(sessionIndex, 1);
     }
