@@ -23,14 +23,6 @@
       "password": "$2b$10$CIpyfpdBHr5nMcGhuocOUu2qAEia4Wrz68uADecYmK7WFFlA55pBS",
       "phoneNumber": "2",
       "pools": []
-    },
-    {
-      "userId": "6ocstko6a",
-      "username": "hi hi",
-      "email": "hi@gmail.com",
-      "password": "$2b$10$d2Zqu12LxrtMSEihUw61keJ9W9TWvidcTmx4c2/roXS5UjPb8Tq.i",
-      "phoneNumber": "1",
-      "pools": []
     }
   ],
   "globalPools": [],
