@@ -28,6 +28,8 @@ export interface Pool {
 }
 
 export interface Request {
+    requestId: string;
+    quantity: number;
     poolId: string;
     direction: 'outgoing' | 'incoming';
     fromUserId: string;
@@ -182,6 +184,16 @@ export function generateUserId() {
     const { users } = getData();
     let randid = Math.random().toString(36).substr(2, 9);
     while (users.some(user => user.userId === randid)) {
+        randid = Math.random().toString(36).substr(2, 9);
+    }
+
+    return randid;
+}
+
+export function generateRequestId() {
+    const { users } = getData();
+    let randid = Math.random().toString(36).substr(2, 9);
+    while (users.some(user => user.requests.some(request => request.requestId === randid))) {
         randid = Math.random().toString(36).substr(2, 9);
     }
 

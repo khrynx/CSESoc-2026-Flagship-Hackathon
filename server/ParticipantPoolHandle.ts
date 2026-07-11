@@ -1,4 +1,5 @@
 import { cleanupInactivePools, getData, persistData } from './dataStore.js'
+import { createRequest } from './permissions.js'
 
 export function joinPool(userId: string, poolId: string, quantity: number) {
     cleanupInactivePools();
@@ -31,27 +32,30 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
         throw new Error('Not enough quantity available in the pool');
     }
 
-    pool.currentTotal += quantity;
+    // send a request to the host to join the pool
+    createRequest(userId, poolId);
 
-    const existingParticipant = pool.participants.find((participant) => participant.userId === userId);
-    if (existingParticipant) {
-        existingParticipant.quantity += quantity;
-    } else {
-        pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
-    }
+    // pool.currentTotal += quantity;
 
-    if (!user.participatingPools.some((p) => p.id === pool.id)) {
-        user.participatingPools.push(pool);
-    }
+    // const existingParticipant = pool.participants.find((participant) => participant.userId === userId);
+    // if (existingParticipant) {
+    //     existingParticipant.quantity += quantity;
+    // } else {
+    //     pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
+    // }
 
-    persistData();
+    // if (!user.participatingPools.some((p) => p.id === pool.id)) {
+    //     user.participatingPools.push(pool);
+    // }
 
-    const cleanupResult = cleanupInactivePools();
-    const wasRemoved = cleanupResult.removedPoolIds.includes(poolId);
-    return {
-        pool: wasRemoved ? null : pool,
-        removed: wasRemoved,
-    };
+    // persistData();
+
+    // const cleanupResult = cleanupInactivePools();
+    // const wasRemoved = cleanupResult.removedPoolIds.includes(poolId);
+    // return {
+    //     pool: wasRemoved ? null : pool,
+    //     removed: wasRemoved,
+    // };
 }
 
 export function getHost(userId: string, poolId: string) {
