@@ -54,29 +54,14 @@ export function getParticipants(poolId: string) {
     return pool.participants;
 }
 
-export function returnUserPools(userId: string) {
+export function getUserParticipantPools(userId: string) {
     const { users } = getData();
     const user = users.find((u) => u.userId === userId); 
-    getUserPools(userId); // Populate the user's pools before returning
-    if (!user) {
-        throw new Error('User not found');
-    }
-    return user.pools;
-}
-
-function getUserPools(userId: string) {
-    const { users , globalPools} = getData();
-    const user = users.find((u) => u.userId === userId);
 
     if (!user) {
         throw new Error('User not found');
     }
-
-    for (const pool of globalPools) {
-        if (pool.participants.some((participant) => participant.userId === userId)) {
-            user.pools.push(pool);
-        }
-    }
+    return user.participatingPools;
 }
 
 export function leavePool(userId: string, poolId: string) {
@@ -92,7 +77,7 @@ export function leavePool(userId: string, poolId: string) {
     }   
 
     if (pool.participants[0].userId === userId) {
-        throw new Error('Host cannot leave the pool');
+        throw new Error('Host cannot leave the pool'); // redundant, ignore
     }
 
     for (let i = 0; i < pool.participants.length; i++) {
