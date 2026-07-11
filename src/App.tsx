@@ -119,6 +119,7 @@ function App() {
   const mapInstanceRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
   const selectedLocationMarkerRef = useRef<maplibregl.Marker | null>(null)
+  const hasAutoRetriedRef = useRef(false)
 
   const selectedBuy = useMemo(
     () => groupBuys.find((item) => item.id === selectedId) ?? groupBuys[0],
@@ -155,7 +156,15 @@ function App() {
     loadPools()
   }, [])
 
-  const retryMap = () => {
+  const retryMap = (source: 'manual' | 'auto' = 'manual') => {
+    if (source === 'auto' && hasAutoRetriedRef.current) {
+      return
+    }
+
+    if (source === 'auto') {
+      hasAutoRetriedRef.current = true
+    }
+
     if (mapInstanceRef.current) {
       mapInstanceRef.current.remove()
       mapInstanceRef.current = null
@@ -204,16 +213,22 @@ function App() {
       })
       resizeObserver.observe(container)
 
+      let settled = false
+
       const markReady = () => {
+        if (settled) {
+          return
+        }
+        settled = true
         setMapError(false)
         setMapReady(true)
         requestAnimationFrame(() => map.resize())
       }
 
       const timeoutId = window.setTimeout(() => {
-        if (!mapReady) {
+        if (!settled) {
           setMapError(true)
-          markReady()
+          retryMap('auto')
         }
       }, 8000)
 
@@ -672,7 +687,7 @@ function App() {
             </div>
             <div className="map-actions">
               <span className="pill">Updated 2 min ago</span>
-              <button type="button" className="ghost-btn" onClick={retryMap}>
+              <button type="button" className="ghost-btn" onClick={() => retryMap('manual')}>
                 Retry map
               </button>
             </div>
