@@ -24,6 +24,8 @@ type GroupBuy = {
   }
 }
 
+const normalMapStyleUrl = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+
 const groupBuys: GroupBuy[] = [
   {
     id: 1,
@@ -81,6 +83,8 @@ const groupBuys: GroupBuy[] = [
 function App() {
   const [selectedId, setSelectedId] = useState(1)
   const [mapReady, setMapReady] = useState(false)
+  const [mapError, setMapError] = useState(false)
+  const [mapRetryCount, setMapRetryCount] = useState(0)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [view, setView] = useState<'app' | 'auth'>('auth')
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
@@ -151,32 +155,78 @@ function App() {
     loadPools()
   }, [])
 
+  const retryMap = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove()
+      mapInstanceRef.current = null
+    }
+
+    if (mapContainerRef.current) {
+      mapContainerRef.current.innerHTML = ''
+    }
+
+    setMapReady(false)
+    setMapError(false)
+    setMapRetryCount((current) => current + 1)
+  }
+
   useEffect(() => {
-    if (!mapContainerRef.current) {
+    if (!mapContainerRef.current || mapInstanceRef.current) {
       return
     }
 
-    if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: userLocation ? [userLocation.lng, userLocation.lat] : [groupBuys[0].position.lng, groupBuys[0].position.lat],
+    const container = mapContainerRef.current
+    const defaultCenter: [number, number] = userLocation
+      ? [userLocation.lng, userLocation.lat]
+      : [groupBuys[0].position.lng, groupBuys[0].position.lat]
+
+    const initializeMap = () => {
+      if (!container.isConnected || !container.clientWidth || !container.clientHeight) {
+        window.setTimeout(initializeMap, 150)
+        return
+      }
+
+      const map = new maplibregl.Map({
+        container,
+        style: normalMapStyleUrl,
+        center: defaultCenter,
         zoom: userLocation ? 13 : 12,
         attributionControl: false,
       })
 
-      mapInstanceRef.current.addControl(new maplibregl.NavigationControl(), 'top-right')
-      mapInstanceRef.current.addControl(
-        new maplibregl.AttributionControl({ compact: true }),
-        'bottom-right',
-      )
+      mapInstanceRef.current = map
 
-      mapInstanceRef.current.on('load', () => {
-        requestAnimationFrame(() => mapInstanceRef.current?.resize())
+      map.addControl(new maplibregl.NavigationControl(), 'top-right')
+      map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right')
+
+      const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => map.resize())
+      })
+      resizeObserver.observe(container)
+
+      const markReady = () => {
+        setMapError(false)
         setMapReady(true)
+        requestAnimationFrame(() => map.resize())
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        if (!mapReady) {
+          setMapError(true)
+          markReady()
+        }
+      }, 8000)
+
+      map.on('load', () => {
+        window.clearTimeout(timeoutId)
+        markReady()
       })
 
-      mapInstanceRef.current.on('click', (event) => {
+      map.on('error', () => {
+        setMapError(true)
+      })
+
+      map.on('click', (event) => {
         const { lng, lat } = event.lngLat
         setPoolForm((current) => ({
           ...current,
@@ -190,11 +240,27 @@ function App() {
 
         selectedLocationMarkerRef.current = new maplibregl.Marker({ color: '#ef4444' })
           .setLngLat([lng, lat])
-          .addTo(mapInstanceRef.current!)
+          .addTo(map)
       })
+
+      return () => {
+        window.clearTimeout(timeoutId)
+        resizeObserver.disconnect()
+      }
     }
 
+    const timerId = window.setTimeout(initializeMap, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
+  }, [userLocation, mapRetryCount])
+
+  useEffect(() => {
     const map = mapInstanceRef.current
+    if (!map) {
+      return
+    }
 
     markersRef.current.forEach((marker) => marker.remove())
     markersRef.current = pools.map((pool) => {
@@ -208,7 +274,7 @@ function App() {
       marker.getElement().addEventListener('click', () => setSelectedId(Number(pool.id)))
       return marker
     })
-  }, [userLocation, pools])
+  }, [pools])
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
@@ -604,12 +670,18 @@ function App() {
               <p className="eyebrow">Live around you</p>
               <h3>Nearby shared buys</h3>
             </div>
-            <span className="pill">Updated 2 min ago</span>
+            <div className="map-actions">
+              <span className="pill">Updated 2 min ago</span>
+              <button type="button" className="ghost-btn" onClick={retryMap}>
+                Retry map
+              </button>
+            </div>
           </div>
 
           <div className="map-surface">
             <div ref={mapContainerRef} className="map-canvas" />
             {!mapReady ? <div className="map-loading">Loading map…</div> : null}
+            {mapError ? <div className="map-loading">Map is taking longer than expected. You can still create a pool and the location picker will work.</div> : null}
           </div>
         </div>
 
