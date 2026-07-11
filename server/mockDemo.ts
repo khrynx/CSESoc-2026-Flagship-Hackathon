@@ -34,6 +34,11 @@ export function initMockData() {
     const pool5 = makePool(user4.userId, 'Canned Tuna', 'A lot of canned tuna', 2, 70, daysFromNow(16), 151.2743, -33.8908, 10, 'Pantry & Dry Goods');
     const pool6 = makePool(user5.userId, 'Soccer Balls', 'HAALAND HAALAND', 4, 10, daysFromNow(22), 151.2263, -33.8849, 5, 'Sports & Outdoors');
     const pool7 = makePool(user6.userId, 'Hot Wheels', 'Good ol\' Hot Wheels', 3, 40, daysFromNow(28), 151.0574, -33.9443, 20, 'Toys & Games');
+    const pool8 = makePool(user7.userId, 'LEGO Sets', 'Amazing LEGO sets for building!', 10, 20, new Date('2026-08-20'), -33.8978, 151.2643, 15, 'Toys & Games');
+    const pool9 = makePool(user8.userId, 'Board Games', 'Fun board games for the whole family!', 5, 30, new Date('2026-09-10'), -33.8738, 151.2089, 10, 'Toys & Games');
+    const pool10 = makePool(user9.userId, 'Video Games', 'Latest video games for your console!', 40, 5, new Date('2026-10-05'), -33.8829, 151.2243, 5, 'Toys & Games');
+    const pool11 = makePool(user10.userId, 'Action Figures', 'Collectible action figures from your favorite franchises!', 15, 25, new Date('2026-11-15'), -33.9493, 151.0514, 12, 'Toys & Games');
+    const pool12 = makePool(user11.userId, 'Puzzles', 'Challenging puzzles for all ages!', 8, 40, new Date('2026-12-01'), -33.8808, 151.2793, 8, 'Toys & Games');
 
     // Create host mock reviews
     // addReview(userId: string, revieweeId: string, rating: number, comment: string)
