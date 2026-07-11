@@ -3,7 +3,7 @@ import { getUserById } from './auth.js'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { cleanupInactivePools, getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
-import { searchPools } from './search.js'
+import { filterAllPools, searchPools } from './search.js'
 
 const router = express.Router()
 
@@ -154,32 +154,31 @@ router.get('/users/:userId/requests', (req, res) => {
 
 router.get('/search', (req, res) => {
   try {
-    const { q, distance, lng, lat, categories } = req.query
+    const { q, distance, lng, lat, category, price, size, fullness, rating, deadlineBefore } = req.query
 
     let results = searchPools(String(q ?? ''))
 
-    if (categories !== undefined) {
-      const selectedCategories = String(categories)
-        .split(',')
-        .map((category) => category.trim())
-        .filter(Boolean)
+    const parsedDistance = distance !== undefined ? Number(distance) : undefined
+    const parsedLng = lng !== undefined ? Number(lng) : undefined
+    const parsedLat = lat !== undefined ? Number(lat) : undefined
+    const parsedPrice = price !== undefined ? Number(price) : undefined
+    const parsedSize = size !== undefined ? Number(size) : undefined
+    const parsedFullness = fullness !== undefined ? Number(fullness) : undefined
+    const parsedRating = rating !== undefined ? Number(rating) : undefined
+    const parsedDeadline = deadlineBefore !== undefined ? new Date(String(deadlineBefore)) : undefined
 
-      if (selectedCategories.length > 0) {
-        const categorySet = new Set(selectedCategories)
-        results = results.filter((pool) => categorySet.has(String(pool.category ?? '')))
-      }
-    }
-
-    if (distance !== undefined && lng !== undefined && lat !== undefined) {
-      const maxDist = Number(distance)
-      const uLng = Number(lng)
-      const uLat = Number(lat)
-      results = results.filter((pool) => {
-        const latd = pool.latitude - uLat
-        const lngd = pool.longitude - uLng
-        return Math.sqrt(latd * latd + lngd * lngd) <= maxDist
-      })
-    }
+    results = filterAllPools(
+      results,
+      Number.isFinite(parsedDistance) ? parsedDistance : undefined,
+      Number.isFinite(parsedLng) ? parsedLng : undefined,
+      Number.isFinite(parsedLat) ? parsedLat : undefined,
+      Number.isFinite(parsedPrice) ? parsedPrice : undefined,
+      Number.isFinite(parsedSize) ? parsedSize : undefined,
+      category ? String(category) as never : undefined,
+      Number.isFinite(parsedFullness) ? parsedFullness : undefined,
+      Number.isFinite(parsedRating) ? parsedRating : undefined,
+      parsedDeadline && !Number.isNaN(parsedDeadline.getTime()) ? parsedDeadline : undefined,
+    )
 
     res.json({ pools: results })
   } catch (error) {

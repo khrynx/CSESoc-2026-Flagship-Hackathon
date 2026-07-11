@@ -151,7 +151,15 @@ function App() {
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [homeSearchQuery, setHomeSearchQuery] = useState('')
   const [homeDistanceFilter, setHomeDistanceFilter] = useState('')
-  const [homeCategoryFilters, setHomeCategoryFilters] = useState<string[]>([])
+  const [showHomeAdvancedSearch, setShowHomeAdvancedSearch] = useState(false)
+  const [homeAdvancedFilters, setHomeAdvancedFilters] = useState({
+    category: '',
+    price: '',
+    size: '',
+    fullness: '',
+    rating: '',
+    deadlineDays: '',
+  })
   const [homeSearchResults, setHomeSearchResults] = useState<Pool[]>([])
   const [showHomeDropdown, setShowHomeDropdown] = useState(false)
   const [displayedPools, setDisplayedPools] = useState<Pool[]>([])
@@ -193,13 +201,21 @@ function App() {
     return hostId === currentUser.userId
   }
 
-  const toggleHomeCategoryFilter = (category: string) => {
-    setHomeCategoryFilters((current) =>
-      current.includes(category)
-        ? current.filter((value) => value !== category)
-        : [...current, category],
-    )
+  const isCurrentUserInPool = (pool: Pool): boolean => {
+    if (!currentUser?.userId) {
+      return false
+    }
+    return pool.participants.some((participant) => participant.userId === currentUser.userId)
   }
+
+  const hasHomeAdvancedFilters = Boolean(
+    homeAdvancedFilters.category ||
+      homeAdvancedFilters.price ||
+      homeAdvancedFilters.size ||
+      homeAdvancedFilters.fullness ||
+      homeAdvancedFilters.rating ||
+      homeAdvancedFilters.deadlineDays,
+  )
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -249,13 +265,22 @@ function App() {
           setDisplayedPools(latestPools)
         }
 
-        if (!homeSearchQuery.trim() && !homeDistanceFilter) {
+        if (!homeSearchQuery.trim() && !homeDistanceFilter && !hasHomeAdvancedFilters) {
           setHomeSearchResults([])
           return
         }
 
         const searchParams = new URLSearchParams()
         if (homeSearchQuery.trim()) searchParams.set('q', homeSearchQuery)
+        if (homeAdvancedFilters.category) searchParams.set('category', homeAdvancedFilters.category)
+        if (homeAdvancedFilters.price) searchParams.set('price', homeAdvancedFilters.price)
+        if (homeAdvancedFilters.size) searchParams.set('size', homeAdvancedFilters.size)
+        if (homeAdvancedFilters.fullness) searchParams.set('fullness', homeAdvancedFilters.fullness)
+        if (homeAdvancedFilters.rating) searchParams.set('rating', homeAdvancedFilters.rating)
+        if (homeAdvancedFilters.deadlineDays) {
+          const deadlineBefore = new Date(Date.now() + Number(homeAdvancedFilters.deadlineDays) * 24 * 60 * 60 * 1000)
+          searchParams.set('deadlineBefore', deadlineBefore.toISOString())
+        }
         if (homeDistanceFilter && userLocation) {
           searchParams.set('distance', (Number(homeDistanceFilter) / 111).toFixed(6))
           searchParams.set('lng', String(userLocation.lng))
@@ -307,7 +332,7 @@ function App() {
       cancelled = true
       window.clearInterval(pollId)
     }
-  }, [activeSearchQuery, distanceFilter, homeSearchQuery, homeDistanceFilter, userLocation])
+  }, [activeSearchQuery, distanceFilter, hasHomeAdvancedFilters, homeAdvancedFilters, homeSearchQuery, homeDistanceFilter, userLocation])
 
   useEffect(() => {
     if (!currentUser?.userId) {
@@ -488,7 +513,7 @@ function App() {
   }, [activeSearchQuery, distanceFilter, pools, userLocation])
 
   useEffect(() => {
-    if (!homeSearchQuery.trim() && !homeDistanceFilter && homeCategoryFilters.length === 0) {
+    if (!homeSearchQuery.trim() && !homeDistanceFilter && !hasHomeAdvancedFilters) {
       setHomeSearchResults([])
       setShowHomeDropdown(false)
       return
@@ -497,8 +522,14 @@ function App() {
       try {
         const params = new URLSearchParams()
         if (homeSearchQuery.trim()) params.set('q', homeSearchQuery)
-        if (homeCategoryFilters.length > 0) {
-          params.set('categories', homeCategoryFilters.join(','))
+        if (homeAdvancedFilters.category) params.set('category', homeAdvancedFilters.category)
+        if (homeAdvancedFilters.price) params.set('price', homeAdvancedFilters.price)
+        if (homeAdvancedFilters.size) params.set('size', homeAdvancedFilters.size)
+        if (homeAdvancedFilters.fullness) params.set('fullness', homeAdvancedFilters.fullness)
+        if (homeAdvancedFilters.rating) params.set('rating', homeAdvancedFilters.rating)
+        if (homeAdvancedFilters.deadlineDays) {
+          const deadlineBefore = new Date(Date.now() + Number(homeAdvancedFilters.deadlineDays) * 24 * 60 * 60 * 1000)
+          params.set('deadlineBefore', deadlineBefore.toISOString())
         }
         if (homeDistanceFilter && userLocation) {
           params.set('distance', (Number(homeDistanceFilter) / 111).toFixed(6))
@@ -516,7 +547,7 @@ function App() {
       }
     }
     run()
-  }, [homeSearchQuery, homeDistanceFilter, homeCategoryFilters, userLocation])
+  }, [homeSearchQuery, homeDistanceFilter, homeAdvancedFilters, hasHomeAdvancedFilters, userLocation])
 
   useEffect(() => {
     const map = mapInstanceRef.current
@@ -915,49 +946,119 @@ function App() {
               </button>
             </form>
 
-            <div className="home-category-row">
-              {poolCategories.map((category) => {
-                const isActive = homeCategoryFilters.includes(category)
-                return (
-                  <button
-                    key={category}
-                    type="button"
-                    className={`home-category-chip${isActive ? ' active' : ''}`}
-                    onClick={() => toggleHomeCategoryFilter(category)}
-                  >
-                    {category}
-                  </button>
-                )
-              })}
+            <div className="home-advanced-row">
+              <button
+                type="button"
+                className={`home-advanced-toggle${showHomeAdvancedSearch ? ' active' : ''}`}
+                onClick={() => setShowHomeAdvancedSearch((current) => !current)}
+              >
+                Advanced search
+              </button>
             </div>
+
+            {showHomeAdvancedSearch && (
+              <div className="home-advanced-panel">
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.category}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, category: e.target.value }))}
+                >
+                  <option value="">Any category</option>
+                  {poolCategories.map((category) => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.price}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, price: e.target.value }))}
+                >
+                  <option value="">Any price</option>
+                  <option value="5">Up to $5</option>
+                  <option value="10">Up to $10</option>
+                  <option value="20">Up to $20</option>
+                  <option value="50">Up to $50</option>
+                  <option value="100">Up to $100</option>
+                </select>
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.size}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, size: e.target.value }))}
+                >
+                  <option value="">Any size</option>
+                  <option value="5">Up to 5 units</option>
+                  <option value="10">Up to 10 units</option>
+                  <option value="20">Up to 20 units</option>
+                  <option value="50">Up to 50 units</option>
+                </select>
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.fullness}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, fullness: e.target.value }))}
+                >
+                  <option value="">Any fullness</option>
+                  <option value="0.25">Up to 25% filled</option>
+                  <option value="0.5">Up to 50% filled</option>
+                  <option value="0.75">Up to 75% filled</option>
+                  <option value="1">Any open pool</option>
+                </select>
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.rating}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, rating: e.target.value }))}
+                >
+                  <option value="">Any host rating</option>
+                  <option value="5">5.0+</option>
+                  <option value="4">4.0+</option>
+                  <option value="3">3.0+</option>
+                  <option value="2">2.0+</option>
+                </select>
+                <select
+                  className="home-advanced-select"
+                  value={homeAdvancedFilters.deadlineDays}
+                  onChange={(e) => setHomeAdvancedFilters((current) => ({ ...current, deadlineDays: e.target.value }))}
+                >
+                  <option value="">Any deadline</option>
+                  <option value="1">Within 24 hours</option>
+                  <option value="3">Within 3 days</option>
+                  <option value="7">Within 7 days</option>
+                  <option value="14">Within 14 days</option>
+                  <option value="30">Within 30 days</option>
+                </select>
+              </div>
+            )}
 
             {showHomeDropdown && homeSearchResults.length > 0 && (
               <ul className="home-dropdown">
-                {homeSearchResults.map((pool) => (
-                  <li
-                    key={pool.id}
-                    className="home-dropdown-item"
-                    onClick={() => {
-                      setSelectedPoolId(pool.id)
-                      setShowHomeDropdown(false)
-                      setHomeSearchQuery('')
-                      setView('app')
-                    }}
-                  >
-                    <strong>{pool.itemName}</strong>
-                    <span>{pool.desc}</span>
-                    {pool.category ? <span>{pool.category}</span> : null}
-                    <span className="dropdown-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
-                  </li>
-                ))}
+                {homeSearchResults.map((pool) => {
+                  const joined = isCurrentUserInPool(pool)
+                  return (
+                    <li
+                      key={pool.id}
+                      className={`home-dropdown-item${joined ? ' joined' : ''}`}
+                      onClick={() => {
+                        setSelectedPoolId(pool.id)
+                        setShowHomeDropdown(false)
+                        setHomeSearchQuery('')
+                        setView('app')
+                      }}
+                    >
+                      <strong>{pool.itemName}</strong>
+                      <span>{pool.desc}</span>
+                      {pool.category ? <span>{pool.category}</span> : null}
+                      {joined ? <span className="joined-pill">Already joined</span> : null}
+                      <span className="dropdown-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
+                    </li>
+                  )
+                })}
               </ul>
             )}
 
-            {(homeSearchQuery || homeDistanceFilter || homeCategoryFilters.length > 0) && !showHomeDropdown && homeSearchResults.length === 0 && (
+            {(homeSearchQuery || homeDistanceFilter || hasHomeAdvancedFilters) && !showHomeDropdown && homeSearchResults.length === 0 && (
               <div className="home-no-results">No pools found
                 {homeSearchQuery ? ` for “${homeSearchQuery}”` : ''}
                 {homeDistanceFilter ? ` within ${homeDistanceFilter} km` : ''}
-                {homeCategoryFilters.length > 0 ? ` in ${homeCategoryFilters.join(', ')}` : ''}
+                {homeAdvancedFilters.category ? ` in ${homeAdvancedFilters.category}` : ''}
               </div>
             )}
           </div>
@@ -1137,21 +1238,25 @@ function App() {
                 <p className="pool-desc">Try a different search term or distance.</p>
               ) : (
                 <ul className="search-result-list">
-                  {displayedPools.map((pool) => (
-                    <li
-                      key={pool.id}
-                      className="search-result-item"
-                      onClick={() => {
-                        setSelectedPoolId(pool.id)
-                        setSelectedLocation(null)
-                        setShowSearchResults(false)
-                      }}
-                    >
-                      <strong>{pool.itemName}</strong>
-                      <span>{pool.desc}</span>
-                      <span className="result-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
-                    </li>
-                  ))}
+                  {displayedPools.map((pool) => {
+                    const joined = isCurrentUserInPool(pool)
+                    return (
+                      <li
+                        key={pool.id}
+                        className={`search-result-item${joined ? ' joined' : ''}`}
+                        onClick={() => {
+                          setSelectedPoolId(pool.id)
+                          setSelectedLocation(null)
+                          setShowSearchResults(false)
+                        }}
+                      >
+                        <strong>{pool.itemName}</strong>
+                        <span>{pool.desc}</span>
+                        {joined ? <span className="joined-pill">Already joined</span> : null}
+                        <span className="result-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </div>

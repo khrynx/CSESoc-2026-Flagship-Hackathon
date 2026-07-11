@@ -14,17 +14,19 @@ export function searchPools(query: string) {
   })
 }
 
-export function filterAllPools(distance: number, 
-    userLongitude: number, 
-    userLatitude: number, 
-    price: number, 
-    size: number, 
-    category: Category, 
-    fullness: number,
-    rating: number,
-    deadline: Date) {
-  const { globalPools } = getData();
-  let filteredPools = globalPools;
+export function filterAllPools(
+  pools: Pool[],
+  distance?: number,
+  userLongitude?: number,
+  userLatitude?: number,
+  price?: number,
+  size?: number,
+  category?: Category,
+  fullness?: number,
+  rating?: number,
+  deadline?: Date,
+) {
+  let filteredPools = pools;
   filteredPools = filterPoolsDistance(distance, userLongitude, userLatitude, filteredPools);
   filteredPools = filterPoolsPrice(price, filteredPools);
   filteredPools = filterPoolsSize(size, filteredPools);
@@ -32,10 +34,11 @@ export function filterAllPools(distance: number,
   filteredPools = filterPoolsFullness(fullness, filteredPools);
   filteredPools = filterPoolsRating(rating, filteredPools); 
   filteredPools = filterPoolsDeadline(deadline, filteredPools);
+  return filteredPools;
 }
 
-function filterPoolsDistance(distance: number, userLongitude: number, userLatitude: number, pools: Pool[]) {
-  if (!distance) {
+function filterPoolsDistance(distance: number | undefined, userLongitude: number | undefined, userLatitude: number | undefined, pools: Pool[]) {
+  if (!distance || userLongitude === undefined || userLatitude === undefined) {
     return pools;
   }
   return pools.filter((pool) => {
@@ -50,35 +53,35 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     return Math.sqrt(latdist * latdist + londist * londist);
 }
 
-function filterPoolsPrice(price: number, pools: Pool[]) {
+function filterPoolsPrice(price: number | undefined, pools: Pool[]) {
   if (!price) {
     return pools;
   }
   return pools.filter((pool) => pool.price <= price);
 }
 
-function filterPoolsSize(size: number, pools: Pool[]) {
+function filterPoolsSize(size: number | undefined, pools: Pool[]) {
   if (!size) {
     return pools;
   }
   return pools.filter((pool) => pool.quantityGoal <= size);
 }
 
-function filterPoolsCategory(category: Category, pools: Pool[]) {
+function filterPoolsCategory(category: Category | undefined, pools: Pool[]) {
   if (!category) {
     return pools;
   }
   return pools.filter((pool) => pool.category === category);
 }
 
-function filterPoolsFullness(fullness: number, pools: Pool[]) { 
+function filterPoolsFullness(fullness: number | undefined, pools: Pool[]) { 
   if (!fullness) {
     return pools;
   }
   return pools.filter((pool) => pool.currentTotal/pool.quantityGoal <= fullness);
 }
 
-function filterPoolsRating(rating: number, pools: Pool[]) {
+function filterPoolsRating(rating: number | undefined, pools: Pool[]) {
   if (!rating) {
     return pools;
   }
@@ -94,7 +97,7 @@ function filterPoolsRating(rating: number, pools: Pool[]) {
   });
 }
 
-function filterPoolsDeadline(deadline: Date, pools: Pool[]) {
+function filterPoolsDeadline(deadline: Date | undefined, pools: Pool[]) {
   if (!deadline) {
     return pools;
   }

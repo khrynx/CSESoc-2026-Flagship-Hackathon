@@ -298,35 +298,55 @@
   opacity: 0.85;
 }
 
-.home-category-row {
+.home-advanced-row {
   margin-top: 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
-.home-category-chip {
+.home-advanced-toggle {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.04);
   color: rgba(255, 255, 255, 0.72);
   border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.76rem;
+  padding: 8px 14px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
-.home-category-chip:hover {
+.home-advanced-toggle:hover {
   border-color: rgba(255, 255, 255, 0.28);
   color: rgba(255, 255, 255, 0.94);
 }
 
-.home-category-chip.active {
+.home-advanced-toggle.active {
   background: linear-gradient(90deg, rgba(34, 197, 94, 0.22), rgba(20, 184, 166, 0.22));
   border-color: rgba(20, 184, 166, 0.62);
   color: #d1fae5;
+}
+
+.home-advanced-panel {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.home-advanced-select {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.home-advanced-select option {
+  background: #1a1a1a;
+  color: white;
 }
 
 .home-dropdown {
@@ -361,6 +381,11 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+.home-dropdown-item.joined {
+  border: 1px solid rgba(20, 184, 166, 0.45);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(34, 197, 94, 0.08));
+}
+
 .home-dropdown-item strong {
   font-size: 0.95rem;
   color: white;
@@ -375,6 +400,18 @@
   font-size: 0.75rem !important;
   color: #14b8a6 !important;
   font-weight: 600;
+}
+
+.joined-pill {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.69rem;
+  font-weight: 700;
+  color: #ccfbf1;
+  background: rgba(20, 184, 166, 0.3);
+  border: 1px solid rgba(20, 184, 166, 0.45);
+  border-radius: 999px;
+  padding: 3px 8px;
 }
 
 .home-no-results {
@@ -812,6 +849,11 @@
 .search-result-item:hover {
   background: #eef5ff;
   border-color: #93c5fd;
+}
+
+.search-result-item.joined {
+  border-color: #14b8a6;
+  background: linear-gradient(135deg, #e6fffb, #effcf5);
 }
 
 .search-result-item strong {
