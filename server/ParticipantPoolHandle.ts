@@ -33,29 +33,7 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
     }
 
     // send a request to the host to join the pool
-    createRequest(userId, poolId);
-
-    // pool.currentTotal += quantity;
-
-    // const existingParticipant = pool.participants.find((participant) => participant.userId === userId);
-    // if (existingParticipant) {
-    //     existingParticipant.quantity += quantity;
-    // } else {
-    //     pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
-    // }
-
-    // if (!user.participatingPools.some((p) => p.id === pool.id)) {
-    //     user.participatingPools.push(pool);
-    // }
-
-    // persistData();
-
-    // const cleanupResult = cleanupInactivePools();
-    // const wasRemoved = cleanupResult.removedPoolIds.includes(poolId);
-    // return {
-    //     pool: wasRemoved ? null : pool,
-    //     removed: wasRemoved,
-    // };
+    createRequest(userId, poolId, quantity);
 }
 
 export function getHost(userId: string, poolId: string) {
