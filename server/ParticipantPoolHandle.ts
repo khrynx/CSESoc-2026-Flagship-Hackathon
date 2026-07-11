@@ -1,6 +1,8 @@
-import { getData, persistData } from './dataStore.js'
+import { cleanupInactivePools, getData, persistData } from './dataStore.js'
 
 export function joinPool(userId: string, poolId: string, quantity: number) {
+    cleanupInactivePools();
+
     const { users, globalPools } = getData();
     const pool = globalPools.find((p) => p.id === poolId);
     const user = users.find((u) => u.userId === userId);
@@ -13,6 +15,14 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
         throw new Error('User not found');
     }
 
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+        throw new Error('Quantity must be greater than 0');
+    }
+
+    if (new Date(pool.deadline).getTime() <= Date.now()) {
+        throw new Error('Pool deadline has passed');
+    }
+
     if (pool.currentTotal == pool.quantityGoal) { 
         throw new Error('Pool is already at full capacity');
     }
@@ -22,9 +32,26 @@ export function joinPool(userId: string, poolId: string, quantity: number) {
     }
 
     pool.currentTotal += quantity;
-    pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
+
+    const existingParticipant = pool.participants.find((participant) => participant.userId === userId);
+    if (existingParticipant) {
+        existingParticipant.quantity += quantity;
+    } else {
+        pool.participants.push({ userId, username: user.username, quantity, phoneNumber: user.phoneNumber });
+    }
+
+    if (!user.participatingPools.some((p) => p.id === pool.id)) {
+        user.participatingPools.push(pool);
+    }
+
     persistData();
-    return pool;
+
+    const cleanupResult = cleanupInactivePools();
+    const wasRemoved = cleanupResult.removedPoolIds.includes(poolId);
+    return {
+        pool: wasRemoved ? null : pool,
+        removed: wasRemoved,
+    };
 }
 
 export function getHost(userId: string, poolId: string) {

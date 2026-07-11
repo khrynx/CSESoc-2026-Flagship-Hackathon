@@ -196,3 +196,31 @@ export function resetData() {
     saveDataToDisk(data);
     return data;
 }
+
+export function cleanupInactivePools(referenceDate: Date = new Date()) {
+    const store = getData();
+    const cutoff = referenceDate.getTime();
+
+    const removedPoolIds = new Set(
+        store.globalPools
+            .filter((pool) => {
+                const deadlineMs = new Date(pool.deadline as unknown as string | Date).getTime();
+                return pool.currentTotal >= pool.quantityGoal || deadlineMs <= cutoff;
+            })
+            .map((pool) => pool.id)
+    );
+
+    if (removedPoolIds.size === 0) {
+        return { removedPoolIds: [] as string[] };
+    }
+
+    store.globalPools = store.globalPools.filter((pool) => !removedPoolIds.has(pool.id));
+    store.users = store.users.map((user) => ({
+        ...user,
+        hostingPools: user.hostingPools.filter((pool) => !removedPoolIds.has(pool.id)),
+        participatingPools: user.participatingPools.filter((pool) => !removedPoolIds.has(pool.id)),
+    }));
+
+    saveDataToDisk(store);
+    return { removedPoolIds: Array.from(removedPoolIds) };
+}

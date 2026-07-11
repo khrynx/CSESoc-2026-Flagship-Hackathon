@@ -34,7 +34,7 @@ export function makePool(userId: string, itemName: string, desc: string, price: 
         desc,
         price,
         quantityGoal,
-        currentTotal: 0,
+        currentTotal: hostquantity,
         deadline,
         longitude,
         latitude,

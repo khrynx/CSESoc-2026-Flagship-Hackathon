@@ -560,6 +560,18 @@ function App() {
         throw new Error(data.message || 'Unable to join pool.')
       }
 
+      if (data.removed || !data.pool) {
+        setPools((current) => current.filter((pool) => pool.id !== poolId))
+        setDisplayedPools((current) => current.filter((pool) => pool.id !== poolId))
+        setSelectedPoolId(null)
+        setPoolMessage('Joined successfully. Pool is now fulfilled/closed and has been removed.')
+        return
+      }
+
+      const updatedPool = data.pool as Pool
+      setPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
+      setDisplayedPools((current) => current.map((pool) => (pool.id === updatedPool.id ? updatedPool : pool)))
+      setSelectedPoolId(updatedPool.id)
       setPoolMessage('Joined pool successfully.')
     } catch (error) {
       setPoolMessage(error instanceof Error ? error.message : 'Unable to join pool.')
