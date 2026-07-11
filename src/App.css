@@ -67,6 +67,74 @@
   flex-shrink: 0;
 }
 
+/* ── Search bar ──────────────────────────────────────────── */
+.search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.search-input {
+  flex: 1;
+  border: 1px solid #dce7f4;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  background: #f7faff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+  background: white;
+}
+
+.distance-select {
+  border: 1px solid #dce7f4;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  outline: none;
+  font-family: inherit;
+  background: #f7faff;
+  color: #11213a;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 150ms ease;
+}
+
+.distance-select:focus {
+  border-color: #3b82f6;
+}
+
+.distance-select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.search-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #22c55e, #14b8a6);
+  color: white;
+  transition: opacity 150ms ease;
+  flex-shrink: 0;
+}
+
+.search-btn:hover {
+  opacity: 0.85;
+}
+
 /*the map */
 .map-fullscreen {
   flex: 1;
@@ -162,6 +230,12 @@
 
 .popup-detail {
   right: 16px;
+}
+
+.popup-search-results {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 380px;
 }
 
 .popup-header {
@@ -277,6 +351,49 @@
   border: 1px solid #e4edff;
   border-radius: 8px;
   padding: 7px 10px;
+}
+
+/* ── Search results list ─────────────────────────────────── */
+.search-result-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e4edff;
+  background: #f7faff;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.search-result-item:hover {
+  background: #eef5ff;
+  border-color: #93c5fd;
+}
+
+.search-result-item strong {
+  font-size: 0.92rem;
+  color: #11213a;
+}
+
+.search-result-item span {
+  font-size: 0.82rem;
+  color: #5e748f;
+}
+
+.result-meta {
+  font-size: 0.75rem !important;
+  color: #14b8a6 !important;
+  font-weight: 600;
 }
 
 .join-row {

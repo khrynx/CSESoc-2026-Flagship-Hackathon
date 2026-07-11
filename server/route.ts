@@ -2,6 +2,7 @@ import express from 'express'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
 import { getData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, returnUserPools } from './ParticipantPoolHandle.js'
+import { searchPools } from './search.js'
 
 const router = express.Router()
 
@@ -122,6 +123,29 @@ router.get('/users/:userId/pools', (req, res) => {
     res.json({ pools: returnUserPools(req.params.userId) })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load user pools.' })
+  }
+})
+
+router.get('/search', (req, res) => {
+  try {
+    const { q, distance, lng, lat } = req.query
+
+    let results = searchPools(String(q ?? ''))
+
+    if (distance !== undefined && lng !== undefined && lat !== undefined) {
+      const maxDist = Number(distance)
+      const uLng = Number(lng)
+      const uLat = Number(lat)
+      results = results.filter((pool) => {
+        const latd = pool.latitude - uLat
+        const lngd = pool.longitude - uLng
+        return Math.sqrt(latd * latd + lngd * lngd) <= maxDist
+      })
+    }
+
+    res.json({ pools: results })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Search failed.' })
   }
 })
 

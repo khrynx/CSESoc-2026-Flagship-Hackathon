@@ -103,6 +103,22 @@ function App() {
   })
   const [poolMessage, setPoolMessage] = useState('')
   const [joinQuantity, setJoinQuantity] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeSearchQuery, setActiveSearchQuery] = useState('')
+  const [distanceFilter, setDistanceFilter] = useState('')
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [displayedPools, setDisplayedPools] = useState<Array<{
+    id: string
+    itemName: string
+    desc: string
+    price: number
+    quantityGoal: number
+    currentTotal: number
+    deadline: string
+    longitude: number
+    latitude: number
+    participants: Array<{ userId: string; username: string; quantity: number; phoneNumber: string }>
+  }>>([])
   const [selectedLocation, setSelectedLocation] = useState<{ lng: number; lat: number } | null>(null)
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null)
   const [pools, setPools] = useState<Array<{
@@ -276,13 +292,40 @@ function App() {
   }, [userLocation, mapRetryCount])
 
   useEffect(() => {
+    const run = async () => {
+      if (!activeSearchQuery && !distanceFilter) {
+        setDisplayedPools(pools)
+        return
+      }
+      try {
+        const params = new URLSearchParams()
+        if (activeSearchQuery) params.set('q', activeSearchQuery)
+        if (distanceFilter && userLocation) {
+          params.set('distance', (Number(distanceFilter) / 111).toFixed(6))
+          params.set('lng', String(userLocation.lng))
+          params.set('lat', String(userLocation.lat))
+        }
+        const response = await fetch(`/api/search?${params}`)
+        const data = await parseApiResponse(response)
+        if (response.ok) {
+          setDisplayedPools(data.pools ?? [])
+          setShowSearchResults(true)
+        }
+      } catch {
+        setDisplayedPools(pools)
+      }
+    }
+    run()
+  }, [activeSearchQuery, distanceFilter, pools, userLocation])
+
+  useEffect(() => {
     const map = mapInstanceRef.current
     if (!map || !mapReady) {
       return
     }
 
     markersRef.current.forEach((marker) => marker.remove())
-    markersRef.current = pools.map((pool) => {
+    markersRef.current = displayedPools.map((pool) => {
       const marker = new maplibregl.Marker({ color: '#14b8a6' })
         .setLngLat([pool.longitude, pool.latitude])
         .setPopup(
@@ -297,7 +340,7 @@ function App() {
       })
       return marker
     })
-  }, [mapReady, pools])
+  }, [mapReady, displayedPools])
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
@@ -313,7 +356,7 @@ function App() {
     }
 
     markersRef.current.forEach((marker, index) => {
-      const pool = pools[index]
+      const pool = displayedPools[index]
       const element = marker.getElement()
       const isSelected = Boolean(pool && pool.id === selectedPoolId)
       element.style.width = isSelected ? '18px' : '14px'
@@ -576,7 +619,33 @@ function App() {
           <div className="brand-badge">N</div>
           <span className="brand-name">Neighbourly</span>
         </div>
-        <p className="topbar-hint">Click the map to create a pool | Click a marker to join one</p>
+        <form
+          className="search-bar"
+          onSubmit={(e) => { e.preventDefault(); setActiveSearchQuery(searchQuery) }}
+        >
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Search pools…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit" className="search-btn">Search</button>
+          <select
+            className="distance-select"
+            value={distanceFilter}
+            onChange={(e) => { setDistanceFilter(e.target.value); setActiveSearchQuery(searchQuery) }}
+            disabled={!userLocation}
+            title={userLocation ? 'Filter by distance from your location' : 'Allow location access to filter by distance'}
+          >
+            <option value="">Any distance</option>
+            <option value="1">Within 1 km</option>
+            <option value="2">Within 2 km</option>
+            <option value="5">Within 5 km</option>
+            <option value="10">Within 10 km</option>
+            <option value="25">Within 25 km</option>
+          </select>
+        </form>
         <div className="topbar-actions">
           {currentUser && <span className="pill">Hi, {currentUser.username}</span>}
           <button type="button" className="ghost-btn" onClick={() => { setView('auth'); setAuthMode('login'); setAuthMessage('') }}>
@@ -597,6 +666,54 @@ function App() {
         <button type="button" className="map-reload-btn" title="Reload map" onClick={() => retryMap('manual')}>
           ↺
         </button>
+
+        {/* Search results popup – top center */}
+        {showSearchResults && (
+          <aside className="popup popup-search-results">
+            <div className="popup-header">
+              <h3>
+                {displayedPools.length === 0
+                  ? 'No results'
+                  : `${displayedPools.length} pool${displayedPools.length === 1 ? '' : 's'} found`}
+              </h3>
+              <button
+                type="button"
+                className="popup-close"
+                onClick={() => {
+                  setShowSearchResults(false)
+                  setActiveSearchQuery('')
+                  setSearchQuery('')
+                  setDistanceFilter('')
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="popup-body">
+              {displayedPools.length === 0 ? (
+                <p className="pool-desc">Try a different search term or distance.</p>
+              ) : (
+                <ul className="search-result-list">
+                  {displayedPools.map((pool) => (
+                    <li
+                      key={pool.id}
+                      className="search-result-item"
+                      onClick={() => {
+                        setSelectedPoolId(pool.id)
+                        setSelectedLocation(null)
+                        setShowSearchResults(false)
+                      }}
+                    >
+                      <strong>{pool.itemName}</strong>
+                      <span>{pool.desc}</span>
+                      <span className="result-meta">${pool.price} · {pool.quantityGoal - pool.currentTotal} remaining</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </aside>
+        )}
 
         {/* Create pool popup – top left */}
         {selectedLocation && (
