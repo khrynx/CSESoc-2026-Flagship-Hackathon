@@ -10,7 +10,6 @@ export interface Participant {
     username: string;
     quantity: number; // the share of how much of the bulk they want
     phoneNumber: string;
-
 }
 
 export interface Pool {
@@ -24,7 +23,7 @@ export interface Pool {
     deadline: Date; // use date-fns package
     longitude: number;
     latitude: number;
-
+    category: Category;
 }
 
 export interface User {
@@ -58,6 +57,23 @@ export interface Review {
     rating: number; // 1-5
     comment: string;
 }
+
+export const Categories = ["Clothing", 
+                    "Beverages", 
+                    "Fresh Produce", 
+                    "Pantry & Dry Goods", 
+                    "Snacks", 
+                    "Home & Garden", 
+                    "Household Essentials", 
+                    "Sports & Outdoors", 
+                    "Toys & Games", 
+                    "Pet Supplies",
+                    "Health & Wellness",
+                    "Baby & Kids",
+                    "School & Office Supplies"
+                ] as const;
+export type Category = typeof Categories[number];
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

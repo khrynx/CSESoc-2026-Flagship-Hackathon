@@ -32,7 +32,7 @@
       "desc": "ant",
       "price": 67,
       "quantityGoal": 2,
-      "currentTotal": 0,
+      "currentTotal": 1,
       "deadline": "2026-07-18T08:38:00.000Z",
       "longitude": 151.113386,
       "latitude": -33.972711,
@@ -42,6 +42,12 @@
           "username": "Kevin Li",
           "quantity": 1,
           "phoneNumber": "1"
+        },
+        {
+          "userId": "e2k9vn1m8",
+          "username": "Demo User",
+          "quantity": 1,
+          "phoneNumber": "0400000000"
         }
       ]
     }
@@ -50,6 +56,10 @@
     {
       "sessionId": "721tacec5",
       "userId": "dez7v6c44"
+    },
+    {
+      "sessionId": "ccerafubn",
+      "userId": "e2k9vn1m8"
     }
   ]
 }
