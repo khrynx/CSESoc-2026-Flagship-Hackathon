@@ -191,3 +191,8 @@ export function persistData() {
     return data;
 }
 
+export function resetData() {
+    data = createDefaultData();
+    saveDataToDisk(data);
+    return data;
+}

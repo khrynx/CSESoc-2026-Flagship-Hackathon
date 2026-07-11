@@ -30,7 +30,7 @@ router.post('/pools', (req, res) => {
       category
     } = req.body ?? {}
 
-    if (!userId || !itemName || !desc || !price || !quantityGoal || !deadline || longitude === undefined || latitude === undefined || hostquantity === undefined) {
+    if (!userId || !itemName || !desc || !price || !quantityGoal || !deadline || longitude === undefined || latitude === undefined || hostquantity === undefined || !category) {
       res.status(400).json({ message: 'Missing pool details.' })
       return
     }
