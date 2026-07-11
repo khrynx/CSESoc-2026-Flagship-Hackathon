@@ -1,6 +1,6 @@
 import express from 'express'
 import { cancelPool, getHostingPools, makePool } from './HostPoolHandle.js'
-import { getData } from './dataStore.js'
+import { getData, resetData } from './dataStore.js'
 import { getHost, getParticipants, joinPool, leavePool, getUserParticipantPools } from './ParticipantPoolHandle.js'
 import { searchPools } from './search.js'
 
@@ -12,6 +12,15 @@ router.get('/pools', (_req, res) => {
     res.json({ pools: globalPools })
   } catch (error) {
     res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to load pools.' })
+  }
+})
+
+router.post('/reset', (_req, res) => {
+  try {
+    const data = resetData()
+    res.json({ message: 'Data reset successfully.', pools: data.globalPools })
+  } catch (error) {
+    res.status(400).json({ message: error instanceof Error ? error.message : 'Unable to reset data.' })
   }
 })
 

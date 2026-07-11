@@ -566,6 +566,37 @@ function App() {
     }
   }
 
+  const handleRedoReset = async () => {
+    const confirmed = window.confirm('Reset all app data? This will delete all users and pools.')
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/reset', {
+        method: 'POST',
+      })
+      const data = await parseApiResponse(response)
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Unable to reset data.')
+      }
+
+      setPools(Array.isArray(data.pools) ? data.pools : [])
+      setDisplayedPools(Array.isArray(data.pools) ? data.pools : [])
+      setSelectedPoolId(null)
+      setSelectedLocation(null)
+      setPoolMessage('Data reset complete.')
+      if (selectedLocationMarkerRef.current) {
+        selectedLocationMarkerRef.current.remove()
+        selectedLocationMarkerRef.current = null
+      }
+      retryMap('manual')
+    } catch (error) {
+      setPoolMessage(error instanceof Error ? error.message : 'Unable to reset data.')
+    }
+  }
+
   const handleLoginSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -812,6 +843,9 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand-row">
+          <button type="button" className="ghost-btn" onClick={handleRedoReset}>
+            Reset data
+          </button>
           <div className="brand-badge">N</div>
           <span className="brand-name">Neighbourly</span>
         </div>
