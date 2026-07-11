@@ -36,7 +36,9 @@ export function registerUser(username:string, email:string, password:string, pho
         participatingPools: emptyPool,
         hostingPools: emptyPool,
         hostReviews: emptyReviews,
-        participantReviews: emptyReviews
+        participantReviews: emptyReviews,
+        averageHostRating: 0,
+        averageParticipantRating: 0
     };
 
     data.users.push(user);

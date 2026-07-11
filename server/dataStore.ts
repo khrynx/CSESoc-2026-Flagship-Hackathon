@@ -36,6 +36,8 @@ export interface User {
     participatingPools: Pool[];
     hostReviews: Review[];  // reviews received as a host
     participantReviews: Review[]; // reviews received as a participant
+    averageHostRating: number; // average rating received as a host
+    averageParticipantRating: number; // average rating received as a participant
 }
 
 export interface Data {

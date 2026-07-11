@@ -27,6 +27,7 @@ export function addReview(reviewerId: string, revieweeId: string, rating: number
     } else {
         reviewee.participantReviews.push(review);
     }
+    updateAverageRatings(revieweeId);
 }
 
 // Delete a review by its ID and the reviewee's ID
@@ -41,12 +42,14 @@ export function deleteReview(reviewId: string, revieweeId: string) {
     const reviewIndexHost = reviewee.hostReviews.findIndex(review => review.reviewId === reviewId);
     if (reviewIndexHost !== -1) {
         reviewee.hostReviews.splice(reviewIndexHost, 1);
+        updateAverageRatings(revieweeId);
         return;
     }
 
     const reviewIndexParticipant = reviewee.participantReviews.findIndex(review => review.reviewId === reviewId);
     if (reviewIndexParticipant !== -1) {
         reviewee.participantReviews.splice(reviewIndexParticipant, 1);
+        updateAverageRatings(revieweeId);
         return;
     }  
 
@@ -77,6 +80,7 @@ export function getParticipantReviews(userId: string): Review[] {
     return user.participantReviews;
 }
 
+// Edit a review by its ID and the reviewee's ID
 export function editReview(reviewId: string, revieweeId: string, newRating?: number, newComment?: string) {
     const data = getData();
     const reviewee = data.users.find(user => user.userId === revieweeId);
@@ -87,9 +91,11 @@ export function editReview(reviewId: string, revieweeId: string, newRating?: num
 
     editReviewInArray(reviewee.hostReviews, reviewId, newRating, newComment);
     editReviewInArray(reviewee.participantReviews, reviewId, newRating, newComment);
+    updateAverageRatings(revieweeId);
 }
 
-function editReviewInArray(reviews: Review[], reviewId: string, newRating?: number, newComment?: string) {
+// Helper function to edit a review in an array of reviews
+export function editReviewInArray(reviews: Review[], reviewId: string, newRating?: number, newComment?: string) {
     const review = reviews.find(r => r.reviewId === reviewId);
 
     if (!review) {
@@ -105,4 +111,54 @@ function editReviewInArray(reviews: Review[], reviewId: string, newRating?: numb
             reviews[reviewIndex].comment = newComment;
         }
     }
+}
+
+// Calculate the average host rating for a user
+function calculateAverageHostRating(userId: string): number {
+    const data = getData();
+    const user = data.users.find(user => user.userId === userId); 
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const numReviews = user.hostReviews.length;
+    if (numReviews === 0) {
+        return 0;
+    }
+
+    const totalRating = user.hostReviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / numReviews;
+}
+
+// Calculate the average participant rating for a user
+function calculateAverageParticipantRating(userId: string): number {
+    const data = getData();
+    const user = data.users.find(user => user.userId === userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const numReviews = user.participantReviews.length;
+    if (numReviews === 0) {
+        return 0;
+    }
+
+    const totalRating = user.participantReviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / numReviews;
+}
+
+
+// Update the average ratings for a user
+function updateAverageRatings(userId: string) {
+    const data = getData();
+    const user = data.users.find(user => user.userId === userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    user.averageHostRating = calculateAverageHostRating(userId);
+    user.averageParticipantRating = calculateAverageParticipantRating(userId);
 }
