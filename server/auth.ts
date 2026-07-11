@@ -1,4 +1,5 @@
 import { getData, generateUserId, persistData, type Pool, type User } from './dataStore.js';
+import { createSession, getSession, removeSession } from './session.js';
 import bcrypt from 'bcrypt';
 
 export function registerUser(username:string, email:string, password:string, phoneNumber:string) {
@@ -55,7 +56,16 @@ export function loginUser(email:string, inputPassword:string) {
         throw new Error("Incorrect password");
     }
 
+    createSession(user.userId);
+
     return user;
+}
+
+export function logoutUser(sessionId:string) {
+    const session = getSession(sessionId);
+    if (session) {
+        removeSession(sessionId);
+    }
 }
 
 export function editProfile(userId:string, newUsername?:string, newEmail?:string, newPassword?:string, newPhoneNumber?:string) {
